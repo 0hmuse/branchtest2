@@ -1,0 +1,151 @@
+day0401
+<< 스프링 시큐리티 >>
+스프링이 제공하는 로그인폼을 이용해 봐요.
+
+
+**디펜던시 추가
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+
+<dependency>
+	<groupId>org.springframework.security</groupId>
+	<artifactId>spring-security-test</artifactId>
+	<scope>test</scope>
+</dependency>
+
+
+
+<< bitsecurity >>
+/, /all/list	==> 모든 요청은 로그인상관없이 아무나 접근 할 수 있어요.
+/admin/cmd1	==> 모든 요청은 admin이라는 권한(role)이 있어야 사용할 수 있어요.
+/insert		==> 그 나머지 요청은 로그인 후 사용할 수 있어요.
+
+
+위의 설정을 추가하면
+스프링이 제공하는 loginForm을 사용할 수 있어요.
+기본적으로 스프링시큐리티가 "user"사용자 명을 제공합니다.
+암호는 console에 출력이되어있어요
+
+==> 이게 뭐야요?
+	db랑 연동해야지요!!
+
+---------------------------------------------------------------------
+
+인증 : 로그인 처리
+인가 : 권한설정==> 특정서비스에 접근할 수 있는 권한
+			role설정
+
+회원의 정보를 위한 테이블을 다음과 같이 생성해요.
+create table member100(
+	id varchar2(20) primary key,
+	pwd varchar2(100),
+	name varchar2(20),
+	role varchar2(20)	
+);
+
+스프링시큐리티는 패스워드 예를들어 "tiger"라고 하면 그대로 검사하지 않고
+	암호화 하여 검사합니다.
+	그래서 db에 담을때도 암호화 해서 담아야 합니다.
+
+pwd는 암호화하면 길어지기 때문에 여유있게 100자했음
+회원등록을 위한기능
+회원검색을 위한 기능(id로 검색)
+
+**암호화를 위한 객체를 생성한다
+<bean id="passwordEncoder" class="passwordEncoder"></bean>
+
+메인메소드가 있는 클래스에서 다음을 추가해요
+@Bean
+public PasswordEncoder passwordEncoder() {
+	return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+}
+실험을 위하여 두개의 레코드를 추가해요
+MemberManager.insertMember(new MemberVo("tiger",  PasswordEncoderFactories.createDelegatingPasswordEncoder().encode("tiger"), "호랭이", "USER"));
+MemberManager.insertMember(new MemberVo("master", PasswordEncoderFactories.createDelegatingPasswordEncoder().encode("1234"), "마스터", "ADMIN"));
+--> 스프링 시큐리티가 로그인 인증처리할 때 패스워드는 인코딩(암호화)하여 검사하기 때문에 db에 추가할때는 암호화 해서 담아야 한다
+	그다음 실행할때는 주석으로 막아줍니다
+
+**mybatis설정, vo생성
+	회원을 추가하는 메소드와
+	회원아이디를 매개변수로 받아 회원의 정보를 vo로 반환하는 메소드
+
+
+**사용자별 어떤서비스를 받을 수 있는지에 대한
+	시큐리티환경설정을 해준다.
+	--->WebSecurityConfiguerAdapter클래스를 확장(상속)합니다.
+		다음으로 상속해준다
+
+@Configuration		//환경설정 파일이야
+@EnableWebSecurity	//어노테이션기반으로 설정해줄꺼야
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+		@Override
+		protected void configure(HttpSecurity http) throws Exception {
+			// TODO Auto-generated method stub
+			//super.configure(http);
+		
+			http.authorizeRequests()			: 사용자의 요청별 권한 설정을 하겠습니다.
+			.mvcMatchers("/","/all/**").permitAll()		: 이러한 요청들은 아무나 사용할 수 있다
+			.mvcMatchers("/admin/**").hasRole("ADMIN")	: 이러한 요청들은 ADMIN role이 있어야 사용가능하다
+			.anyRequest().authenticated();			: 그리고 그 나머지 요청들은 인증(로그인)만 하면됨
+	}	
+}
+
+**db랑 연동하여 사용자(user)설정을 해준다(그전에는 기본으로 제공하는 user만 알고있음)
+사용자 설정을 위해서는
+스프링 시큐리티가 제공하는 UserDetailService를 구현합니다(반드시 오버라이딩해줘야함)
+
+****Service가 뭐야?
+Controller	: 사용자 요청에 대한 처리
+*Service	: 사용자 요청에 따라 바로 Dao를 처리하는것 뿐 아니라
+			이것저것 처리해야할 일이 많다면, 이런처리를 Controller에 넣으면 가독성이 떨어지고
+			Dao에 넣기도 애매함
+			==> 그러한 애들을 처리하기위해 Service를 사용합니다.
+Dao		: db에 엑세스
+
+
+
+=================================================================================================================================
+
+com.example.demo
+	-> SecurityConfig : http를 이용해서 요청명으로 권한을 줄지, 모두사용하게 할지, 로그인만해서 사용하게 할지 정해준다
+
+	http.authorizeRequests().mvcMatchers("/","/all/**").permitAll().mvcMatchers("/admin/**").hasRole("ADMIN").anyRequest().authenticated();
+http를 사용.인증할께.("/","/all/**")패턴을 쓰는애들은.모두사용할 수 있게.("/admin/**")패턴을 쓰는애들은."ADMIN" role을 가진애들.그나머지는.로그인한애들;
+			   static > all 파일안에 넣어라			   static > admin 파일안에 넣어라
+			   
+	http.formLogin(); : 기본제공되는 loginForm을 사용하겠어.
+	http.httpBasic(); : 기본 프로토콜을 사용하겠어.
+
+
+	-> MemberService : UserDetailService인터페이스를 구현해서 매개변수 username을 사용해서
+		db에 username이랑 지금이랑 매치시키는 클래스
+		return값은 username,password,roles를 셋시켜준다.
+
+	
+	-> MAIN에서	@Bean
+			public PasswordEncoder passwordEncoder() {
+			return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+			}
+			--> 입력한 암호를 암호화 해주는 메소드를 return해준다.			
+insert1건 : MemberManager.insertMember(new MemberVo("tiger",  PasswordEncoderFactories.createDelegatingPasswordEncoder().encode("tiger"), "호랭이", "USER"));
+
+
+
+
+
+<< 스프링 시큐리티가 제공하는 loginForm에는 
+	다음과 같은 _csrf가 hidden으로 전달됩니다 >>
+	==> 이 값이 오지않으면 잘못된 접근으로 처리되어 로그인시도조차 할 수 없어용!
+	<input name="_csrf" type="hidden" value="5b88ab11-b3ed-4751-b85d-23a4de15d941">
+
+	따라서 우리가 직접 loginForm을 만들려면
+	시스템이 생성한 _crsf값을 읽어와서 전달해 줘야해요.
+
+	우리는 jsp를 쓰고싶지 않아요
+		만약 jsp를 사용한다면 ${_cref}라고 설정하면 될텐데,
+
+		정적인 html에서 _csrf값을 읽어올수 없어요
+		jsp가 아닌 동적인 html을 위하여
+		"thymeleaf"를 사용합니다.

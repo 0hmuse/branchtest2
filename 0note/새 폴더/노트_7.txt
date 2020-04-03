@@ -1,0 +1,47 @@
+<< 문자열 처리 >>
+
+자바에서는 문자열처리를 위하여 
+	String, StringBuffer, StringBuilder 클래스를 제공합니다.
+
+	String을 변하지 않는 문자열 처리에 적합합니다.
+	만약, 변하는 문자열 처리를 해야 한다면
+		StringBuffer와 StringBuilder를 권장합니다.
+
+
+StringBuffer String으로 변환하기 위해서는 
+	toString()메소드를 이용합니다.
+
+
+
+<< StringTokenizer >>
+
+
+
+
+
+
+
+<< 날짜와 시간에 대한 클래스 >>
+
+Date
+Calendar
+GregorianCalendar
+
+
+
+
+<< 숙제 >>
+day1227 WordCountTest
+
+
+사용자로 부터 파일명을 입력받아 해당 파일의 단어별 빈도수를 구하여 
+출력합니다.
+
+생각해 볼 문제
+	분석에 의미없는 단어(조사, 전치사, 접속사등)을 
+	제거한 후 처리해 봅니다.
+
+
+
+
+

@@ -1,0 +1,776 @@
+
+CREATE TABLE car (
+       car_no               NUMBER NOT NULL,
+       car_type             VARCHAR2(30) NULL,
+       color                VARCHAR2(30) NULL,
+       seats                NUMBER NULL,
+       fname                VARCHAR2(50) NULL,
+       rent_fee             NUMBER NULL,
+       type_no              NUMBER NOT NULL,
+       center_no            NUMBER NOT NULL
+);
+
+
+ALTER TABLE car
+       ADD  ( PRIMARY KEY (car_no) ) ;
+
+
+CREATE TABLE car_type (
+       type_no              NUMBER NOT NULL,
+       type_name            VARCHAR2(50) NULL,
+       rent_rate            NUMBER NULL
+);
+
+
+ALTER TABLE car_type
+       ADD  ( PRIMARY KEY (type_no) ) ;
+
+
+CREATE TABLE center (
+       center_no            NUMBER NOT NULL,
+       center_name          VARCHAR2(20) NULL,
+       center_tel           VARCHAR2(20) NULL,
+       center_addr          VARCHAR2(50) NULL
+);
+
+
+ALTER TABLE center
+       ADD  ( PRIMARY KEY (center_no) ) ;
+
+
+CREATE TABLE member (
+       id                   VARCHAR2(20) NOT NULL,
+       name                 VARCHAR2(20) NULL,
+       tel                  VARCHAR2(20) NULL
+);
+
+
+ALTER TABLE member
+       ADD  ( PRIMARY KEY (id) ) ;
+
+
+CREATE TABLE options (
+       car_no               NUMBER NOT NULL,
+       option_no            NUMBER NOT NULL
+);
+
+
+ALTER TABLE options
+       ADD  ( PRIMARY KEY (car_no, option_no) ) ;
+
+
+CREATE TABLE optiontypes (
+       option_no            NUMBER NOT NULL,
+       option_name          VARCHAR2(50) NULL,
+       option_fee           NUMBER NULL
+);
+
+
+ALTER TABLE optiontypes
+       ADD  ( PRIMARY KEY (option_no) ) ;
+
+
+CREATE TABLE rent (
+       rent_no              NUMBER NOT NULL,
+       car_no               NUMBER NOT NULL,
+       id                   VARCHAR2(20) NOT NULL,
+       rent_loc             VARCHAR2(50) NULL,
+       return_loc           VARCHAR2(50) NULL,
+       rent_date            DATE NULL,
+       return_date          DATE NULL,
+       total_fee            NUMBER NULL
+);
+
+
+ALTER TABLE rent
+       ADD  ( PRIMARY KEY (rent_no) ) ;
+
+
+ALTER TABLE car
+       ADD  ( FOREIGN KEY (type_no)
+                             REFERENCES car_type ) ;
+
+
+ALTER TABLE car
+       ADD  ( FOREIGN KEY (center_no)
+                             REFERENCES center ) ;
+
+
+ALTER TABLE options
+       ADD  ( FOREIGN KEY (option_no)
+                             REFERENCES optiontypes
+                             ON DELETE SET NULL ) ;
+
+
+ALTER TABLE options
+       ADD  ( FOREIGN KEY (car_no)
+                             REFERENCES car
+                             ON DELETE SET NULL ) ;
+
+
+ALTER TABLE rent
+       ADD  ( FOREIGN KEY (id)
+                             REFERENCES member ) ;
+
+
+ALTER TABLE rent
+       ADD  ( FOREIGN KEY (car_no)
+                             REFERENCES car ) ;
+
+
+
+
+create or replace trigger tD_car after DELETE on car for each row
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+-- DELETE trigger on car 
+declare numrows INTEGER;
+begin
+    /* ERwin Builtin Fri Jan 31 19:01:12 2020 */
+    /* car R/18 options ON PARENT DELETE SET NULL */
+    /* ERWIN_RELATION:PARENT_OWNER="", PARENT_TABLE="car"
+    CHILD_OWNER="", CHILD_TABLE="options"
+    P2C_VERB_PHRASE="R/18", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_18", FK_COLUMNS="car_no" */
+    update options
+      set
+        /* %SetFK(options,NULL) */
+        options.car_no = NULL
+      where
+        /* %JoinFKPK(options,:%Old," = "," and") */
+        options.car_no = :old.car_no;
+
+    /* ERwin Builtin Fri Jan 31 19:01:12 2020 */
+    /* car R/7 rent ON PARENT DELETE RESTRICT */
+    /* ERWIN_RELATION:PARENT_OWNER="", PARENT_TABLE="car"
+    CHILD_OWNER="", CHILD_TABLE="rent"
+    P2C_VERB_PHRASE="R/7", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_7", FK_COLUMNS="car_no" */
+    select count(*) into numrows
+      from rent
+      where
+        /*  %JoinFKPK(rent,:%Old," = "," and") */
+        rent.car_no = :old.car_no;
+    if (numrows > 0)
+    then
+      raise_application_error(
+        -20001,
+        'Cannot DELETE car because rent exists.'
+      );
+    end if;
+
+
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+end;
+/
+
+create or replace trigger tI_car after INSERT on car for each row
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+-- INSERT trigger on car 
+declare numrows INTEGER;
+begin
+    /* ERwin Builtin Fri Jan 31 19:01:12 2020 */
+    /* car_type R/16 car ON CHILD INSERT RESTRICT */
+    /* ERWIN_RELATION:PARENT_OWNER="", PARENT_TABLE="car_type"
+    CHILD_OWNER="", CHILD_TABLE="car"
+    P2C_VERB_PHRASE="R/16", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_16", FK_COLUMNS="type_no" */
+    select count(*) into numrows
+      from car_type
+      where
+        /* %JoinFKPK(:%New,car_type," = "," and") */
+        :new.type_no = car_type.type_no;
+    if (
+      /* %NotnullFK(:%New," is not null and") */
+      
+      numrows = 0
+    )
+    then
+      raise_application_error(
+        -20002,
+        'Cannot INSERT car because car_type does not exist.'
+      );
+    end if;
+
+    /* ERwin Builtin Fri Jan 31 19:01:12 2020 */
+    /* center R/11 car ON CHILD INSERT RESTRICT */
+    /* ERWIN_RELATION:PARENT_OWNER="", PARENT_TABLE="center"
+    CHILD_OWNER="", CHILD_TABLE="car"
+    P2C_VERB_PHRASE="R/11", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_11", FK_COLUMNS="center_no" */
+    select count(*) into numrows
+      from center
+      where
+        /* %JoinFKPK(:%New,center," = "," and") */
+        :new.center_no = center.center_no;
+    if (
+      /* %NotnullFK(:%New," is not null and") */
+      
+      numrows = 0
+    )
+    then
+      raise_application_error(
+        -20002,
+        'Cannot INSERT car because center does not exist.'
+      );
+    end if;
+
+
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+end;
+/
+
+create or replace trigger tU_car after UPDATE on car for each row
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+-- UPDATE trigger on car 
+declare numrows INTEGER;
+begin
+  /* car R/18 options ON PARENT UPDATE SET NULL */
+  /* ERWIN_RELATION:PARENT_OWNER="", PARENT_TABLE="car"
+    CHILD_OWNER="", CHILD_TABLE="options"
+    P2C_VERB_PHRASE="R/18", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_18", FK_COLUMNS="car_no" */
+  if
+    /* %JoinPKPK(:%Old,:%New," <> "," or ") */
+    :old.car_no <> :new.car_no
+  then
+    update options
+      set
+        /* %SetFK(options,NULL) */
+        options.car_no = NULL
+      where
+        /* %JoinFKPK(options,:%Old," = ",",") */
+        options.car_no = :old.car_no;
+  end if;
+
+  /* ERwin Builtin Fri Jan 31 19:01:12 2020 */
+  /* car R/7 rent ON PARENT UPDATE RESTRICT */
+  /* ERWIN_RELATION:PARENT_OWNER="", PARENT_TABLE="car"
+    CHILD_OWNER="", CHILD_TABLE="rent"
+    P2C_VERB_PHRASE="R/7", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_7", FK_COLUMNS="car_no" */
+  if
+    /* %JoinPKPK(:%Old,:%New," <> "," or ") */
+    :old.car_no <> :new.car_no
+  then
+    select count(*) into numrows
+      from rent
+      where
+        /*  %JoinFKPK(rent,:%Old," = "," and") */
+        rent.car_no = :old.car_no;
+    if (numrows > 0)
+    then 
+      raise_application_error(
+        -20005,
+        'Cannot UPDATE car because rent exists.'
+      );
+    end if;
+  end if;
+
+  /* ERwin Builtin Fri Jan 31 19:01:12 2020 */
+  /* car_type R/16 car ON CHILD UPDATE RESTRICT */
+  /* ERWIN_RELATION:PARENT_OWNER="", PARENT_TABLE="car_type"
+    CHILD_OWNER="", CHILD_TABLE="car"
+    P2C_VERB_PHRASE="R/16", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_16", FK_COLUMNS="type_no" */
+  select count(*) into numrows
+    from car_type
+    where
+      /* %JoinFKPK(:%New,car_type," = "," and") */
+      :new.type_no = car_type.type_no;
+  if (
+    /* %NotnullFK(:%New," is not null and") */
+    
+    numrows = 0
+  )
+  then
+    raise_application_error(
+      -20007,
+      'Cannot UPDATE car because car_type does not exist.'
+    );
+  end if;
+
+  /* ERwin Builtin Fri Jan 31 19:01:12 2020 */
+  /* center R/11 car ON CHILD UPDATE RESTRICT */
+  /* ERWIN_RELATION:PARENT_OWNER="", PARENT_TABLE="center"
+    CHILD_OWNER="", CHILD_TABLE="car"
+    P2C_VERB_PHRASE="R/11", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_11", FK_COLUMNS="center_no" */
+  select count(*) into numrows
+    from center
+    where
+      /* %JoinFKPK(:%New,center," = "," and") */
+      :new.center_no = center.center_no;
+  if (
+    /* %NotnullFK(:%New," is not null and") */
+    
+    numrows = 0
+  )
+  then
+    raise_application_error(
+      -20007,
+      'Cannot UPDATE car because center does not exist.'
+    );
+  end if;
+
+
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+end;
+/
+
+create or replace trigger tD_car_type after DELETE on car_type for each row
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+-- DELETE trigger on car_type 
+declare numrows INTEGER;
+begin
+    /* ERwin Builtin Fri Jan 31 19:01:12 2020 */
+    /* car_type R/16 car ON PARENT DELETE RESTRICT */
+    /* ERWIN_RELATION:PARENT_OWNER="", PARENT_TABLE="car_type"
+    CHILD_OWNER="", CHILD_TABLE="car"
+    P2C_VERB_PHRASE="R/16", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_16", FK_COLUMNS="type_no" */
+    select count(*) into numrows
+      from car
+      where
+        /*  %JoinFKPK(car,:%Old," = "," and") */
+        car.type_no = :old.type_no;
+    if (numrows > 0)
+    then
+      raise_application_error(
+        -20001,
+        'Cannot DELETE car_type because car exists.'
+      );
+    end if;
+
+
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+end;
+/
+
+create or replace trigger tU_car_type after UPDATE on car_type for each row
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+-- UPDATE trigger on car_type 
+declare numrows INTEGER;
+begin
+  /* ERwin Builtin Fri Jan 31 19:01:12 2020 */
+  /* car_type R/16 car ON PARENT UPDATE RESTRICT */
+  /* ERWIN_RELATION:PARENT_OWNER="", PARENT_TABLE="car_type"
+    CHILD_OWNER="", CHILD_TABLE="car"
+    P2C_VERB_PHRASE="R/16", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_16", FK_COLUMNS="type_no" */
+  if
+    /* %JoinPKPK(:%Old,:%New," <> "," or ") */
+    :old.type_no <> :new.type_no
+  then
+    select count(*) into numrows
+      from car
+      where
+        /*  %JoinFKPK(car,:%Old," = "," and") */
+        car.type_no = :old.type_no;
+    if (numrows > 0)
+    then 
+      raise_application_error(
+        -20005,
+        'Cannot UPDATE car_type because car exists.'
+      );
+    end if;
+  end if;
+
+
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+end;
+/
+
+create or replace trigger tD_center after DELETE on center for each row
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+-- DELETE trigger on center 
+declare numrows INTEGER;
+begin
+    /* ERwin Builtin Fri Jan 31 19:01:12 2020 */
+    /* center R/11 car ON PARENT DELETE RESTRICT */
+    /* ERWIN_RELATION:PARENT_OWNER="", PARENT_TABLE="center"
+    CHILD_OWNER="", CHILD_TABLE="car"
+    P2C_VERB_PHRASE="R/11", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_11", FK_COLUMNS="center_no" */
+    select count(*) into numrows
+      from car
+      where
+        /*  %JoinFKPK(car,:%Old," = "," and") */
+        car.center_no = :old.center_no;
+    if (numrows > 0)
+    then
+      raise_application_error(
+        -20001,
+        'Cannot DELETE center because car exists.'
+      );
+    end if;
+
+
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+end;
+/
+
+create or replace trigger tU_center after UPDATE on center for each row
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+-- UPDATE trigger on center 
+declare numrows INTEGER;
+begin
+  /* ERwin Builtin Fri Jan 31 19:01:12 2020 */
+  /* center R/11 car ON PARENT UPDATE RESTRICT */
+  /* ERWIN_RELATION:PARENT_OWNER="", PARENT_TABLE="center"
+    CHILD_OWNER="", CHILD_TABLE="car"
+    P2C_VERB_PHRASE="R/11", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_11", FK_COLUMNS="center_no" */
+  if
+    /* %JoinPKPK(:%Old,:%New," <> "," or ") */
+    :old.center_no <> :new.center_no
+  then
+    select count(*) into numrows
+      from car
+      where
+        /*  %JoinFKPK(car,:%Old," = "," and") */
+        car.center_no = :old.center_no;
+    if (numrows > 0)
+    then 
+      raise_application_error(
+        -20005,
+        'Cannot UPDATE center because car exists.'
+      );
+    end if;
+  end if;
+
+
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+end;
+/
+
+create or replace trigger tD_member after DELETE on member for each row
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+-- DELETE trigger on member 
+declare numrows INTEGER;
+begin
+    /* ERwin Builtin Fri Jan 31 19:01:12 2020 */
+    /* member R/8 rent ON PARENT DELETE RESTRICT */
+    /* ERWIN_RELATION:PARENT_OWNER="", PARENT_TABLE="member"
+    CHILD_OWNER="", CHILD_TABLE="rent"
+    P2C_VERB_PHRASE="R/8", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_8", FK_COLUMNS="id" */
+    select count(*) into numrows
+      from rent
+      where
+        /*  %JoinFKPK(rent,:%Old," = "," and") */
+        rent.id = :old.id;
+    if (numrows > 0)
+    then
+      raise_application_error(
+        -20001,
+        'Cannot DELETE member because rent exists.'
+      );
+    end if;
+
+
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+end;
+/
+
+create or replace trigger tU_member after UPDATE on member for each row
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+-- UPDATE trigger on member 
+declare numrows INTEGER;
+begin
+  /* ERwin Builtin Fri Jan 31 19:01:12 2020 */
+  /* member R/8 rent ON PARENT UPDATE RESTRICT */
+  /* ERWIN_RELATION:PARENT_OWNER="", PARENT_TABLE="member"
+    CHILD_OWNER="", CHILD_TABLE="rent"
+    P2C_VERB_PHRASE="R/8", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_8", FK_COLUMNS="id" */
+  if
+    /* %JoinPKPK(:%Old,:%New," <> "," or ") */
+    :old.id <> :new.id
+  then
+    select count(*) into numrows
+      from rent
+      where
+        /*  %JoinFKPK(rent,:%Old," = "," and") */
+        rent.id = :old.id;
+    if (numrows > 0)
+    then 
+      raise_application_error(
+        -20005,
+        'Cannot UPDATE member because rent exists.'
+      );
+    end if;
+  end if;
+
+
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+end;
+/
+
+create or replace trigger tI_options after INSERT on options for each row
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+-- INSERT trigger on options 
+declare numrows INTEGER;
+begin
+    /* ERwin Builtin Fri Jan 31 19:01:12 2020 */
+    /* optiontypes R/19 options ON CHILD INSERT SET NULL */
+    /* ERWIN_RELATION:PARENT_OWNER="", PARENT_TABLE="optiontypes"
+    CHILD_OWNER="", CHILD_TABLE="options"
+    P2C_VERB_PHRASE="R/19", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_19", FK_COLUMNS="option_no" */
+    update options
+      set
+        /* %SetFK(options,NULL) */
+        options.option_no = NULL
+      where
+        not exists (
+          select * from optiontypes
+            where
+              /* %JoinFKPK(:%New,optiontypes," = "," and") */
+              :new.option_no = optiontypes.option_no
+        ) 
+        /* %JoinPKPK(options,:%New," = "," and") */
+         and options.car_no = :new.car_no and
+        options.option_no = :new.option_no;
+
+    /* ERwin Builtin Fri Jan 31 19:01:12 2020 */
+    /* car R/18 options ON CHILD INSERT SET NULL */
+    /* ERWIN_RELATION:PARENT_OWNER="", PARENT_TABLE="car"
+    CHILD_OWNER="", CHILD_TABLE="options"
+    P2C_VERB_PHRASE="R/18", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_18", FK_COLUMNS="car_no" */
+    update options
+      set
+        /* %SetFK(options,NULL) */
+        options.car_no = NULL
+      where
+        not exists (
+          select * from car
+            where
+              /* %JoinFKPK(:%New,car," = "," and") */
+              :new.car_no = car.car_no
+        ) 
+        /* %JoinPKPK(options,:%New," = "," and") */
+         and options.car_no = :new.car_no and
+        options.option_no = :new.option_no;
+
+
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+end;
+/
+
+create or replace trigger tU_options after UPDATE on options for each row
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+-- UPDATE trigger on options 
+declare numrows INTEGER;
+begin
+    /* ERwin Builtin Fri Jan 31 19:01:12 2020 */
+    /* optiontypes R/19 options ON CHILD UPDATE SET NULL */
+    /* ERWIN_RELATION:PARENT_OWNER="", PARENT_TABLE="optiontypes"
+    CHILD_OWNER="", CHILD_TABLE="options"
+    P2C_VERB_PHRASE="R/19", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_19", FK_COLUMNS="option_no" */
+    update options
+      set
+        /* %SetFK(options,NULL) */
+        options.option_no = NULL
+      where
+        not exists (
+          select * from optiontypes
+            where
+              /* %JoinFKPK(:%New,optiontypes," = "," and") */
+              :new.option_no = optiontypes.option_no
+        ) 
+        /* %JoinPKPK(options,:%New," = "," and") */
+         and options.car_no = :new.car_no and
+        options.option_no = :new.option_no;
+
+    /* ERwin Builtin Fri Jan 31 19:01:12 2020 */
+    /* car R/18 options ON CHILD UPDATE SET NULL */
+    /* ERWIN_RELATION:PARENT_OWNER="", PARENT_TABLE="car"
+    CHILD_OWNER="", CHILD_TABLE="options"
+    P2C_VERB_PHRASE="R/18", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_18", FK_COLUMNS="car_no" */
+    update options
+      set
+        /* %SetFK(options,NULL) */
+        options.car_no = NULL
+      where
+        not exists (
+          select * from car
+            where
+              /* %JoinFKPK(:%New,car," = "," and") */
+              :new.car_no = car.car_no
+        ) 
+        /* %JoinPKPK(options,:%New," = "," and") */
+         and options.car_no = :new.car_no and
+        options.option_no = :new.option_no;
+
+
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+end;
+/
+
+create or replace trigger tD_optiontypes after DELETE on optiontypes for each row
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+-- DELETE trigger on optiontypes 
+declare numrows INTEGER;
+begin
+    /* ERwin Builtin Fri Jan 31 19:01:12 2020 */
+    /* optiontypes R/19 options ON PARENT DELETE SET NULL */
+    /* ERWIN_RELATION:PARENT_OWNER="", PARENT_TABLE="optiontypes"
+    CHILD_OWNER="", CHILD_TABLE="options"
+    P2C_VERB_PHRASE="R/19", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_19", FK_COLUMNS="option_no" */
+    update options
+      set
+        /* %SetFK(options,NULL) */
+        options.option_no = NULL
+      where
+        /* %JoinFKPK(options,:%Old," = "," and") */
+        options.option_no = :old.option_no;
+
+
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+end;
+/
+
+create or replace trigger tU_optiontypes after UPDATE on optiontypes for each row
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+-- UPDATE trigger on optiontypes 
+declare numrows INTEGER;
+begin
+  /* optiontypes R/19 options ON PARENT UPDATE SET NULL */
+  /* ERWIN_RELATION:PARENT_OWNER="", PARENT_TABLE="optiontypes"
+    CHILD_OWNER="", CHILD_TABLE="options"
+    P2C_VERB_PHRASE="R/19", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_19", FK_COLUMNS="option_no" */
+  if
+    /* %JoinPKPK(:%Old,:%New," <> "," or ") */
+    :old.option_no <> :new.option_no
+  then
+    update options
+      set
+        /* %SetFK(options,NULL) */
+        options.option_no = NULL
+      where
+        /* %JoinFKPK(options,:%Old," = ",",") */
+        options.option_no = :old.option_no;
+  end if;
+
+
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+end;
+/
+
+create or replace trigger tI_rent after INSERT on rent for each row
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+-- INSERT trigger on rent 
+declare numrows INTEGER;
+begin
+    /* ERwin Builtin Fri Jan 31 19:01:12 2020 */
+    /* member R/8 rent ON CHILD INSERT RESTRICT */
+    /* ERWIN_RELATION:PARENT_OWNER="", PARENT_TABLE="member"
+    CHILD_OWNER="", CHILD_TABLE="rent"
+    P2C_VERB_PHRASE="R/8", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_8", FK_COLUMNS="id" */
+    select count(*) into numrows
+      from member
+      where
+        /* %JoinFKPK(:%New,member," = "," and") */
+        :new.id = member.id;
+    if (
+      /* %NotnullFK(:%New," is not null and") */
+      
+      numrows = 0
+    )
+    then
+      raise_application_error(
+        -20002,
+        'Cannot INSERT rent because member does not exist.'
+      );
+    end if;
+
+    /* ERwin Builtin Fri Jan 31 19:01:12 2020 */
+    /* car R/7 rent ON CHILD INSERT RESTRICT */
+    /* ERWIN_RELATION:PARENT_OWNER="", PARENT_TABLE="car"
+    CHILD_OWNER="", CHILD_TABLE="rent"
+    P2C_VERB_PHRASE="R/7", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_7", FK_COLUMNS="car_no" */
+    select count(*) into numrows
+      from car
+      where
+        /* %JoinFKPK(:%New,car," = "," and") */
+        :new.car_no = car.car_no;
+    if (
+      /* %NotnullFK(:%New," is not null and") */
+      
+      numrows = 0
+    )
+    then
+      raise_application_error(
+        -20002,
+        'Cannot INSERT rent because car does not exist.'
+      );
+    end if;
+
+
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+end;
+/
+
+create or replace trigger tU_rent after UPDATE on rent for each row
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+-- UPDATE trigger on rent 
+declare numrows INTEGER;
+begin
+  /* ERwin Builtin Fri Jan 31 19:01:12 2020 */
+  /* member R/8 rent ON CHILD UPDATE RESTRICT */
+  /* ERWIN_RELATION:PARENT_OWNER="", PARENT_TABLE="member"
+    CHILD_OWNER="", CHILD_TABLE="rent"
+    P2C_VERB_PHRASE="R/8", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_8", FK_COLUMNS="id" */
+  select count(*) into numrows
+    from member
+    where
+      /* %JoinFKPK(:%New,member," = "," and") */
+      :new.id = member.id;
+  if (
+    /* %NotnullFK(:%New," is not null and") */
+    
+    numrows = 0
+  )
+  then
+    raise_application_error(
+      -20007,
+      'Cannot UPDATE rent because member does not exist.'
+    );
+  end if;
+
+  /* ERwin Builtin Fri Jan 31 19:01:12 2020 */
+  /* car R/7 rent ON CHILD UPDATE RESTRICT */
+  /* ERWIN_RELATION:PARENT_OWNER="", PARENT_TABLE="car"
+    CHILD_OWNER="", CHILD_TABLE="rent"
+    P2C_VERB_PHRASE="R/7", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="R_7", FK_COLUMNS="car_no" */
+  select count(*) into numrows
+    from car
+    where
+      /* %JoinFKPK(:%New,car," = "," and") */
+      :new.car_no = car.car_no;
+  if (
+    /* %NotnullFK(:%New," is not null and") */
+    
+    numrows = 0
+  )
+  then
+    raise_application_error(
+      -20007,
+      'Cannot UPDATE rent because car does not exist.'
+    );
+  end if;
+
+
+-- ERwin Builtin Fri Jan 31 19:01:12 2020
+end;
+/
+

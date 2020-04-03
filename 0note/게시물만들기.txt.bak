@@ -1,0 +1,33 @@
+<< 게시판 만들기 >>
+
+0. 게시판의 정보를 저장하기위해 db에 table board랑 board속성을 가진 vo만들기
+
+1. 등록을 위한 Dao 만들기
+	1-1. 등록을 위한 viewPage insertBoard.jsp 만들기
+	1-2. 입력하고 등록을 누르면 dao를 실행시킬 insertBoardOk.jsp를 만들자
+
+2. 글 목록을 불러오는 Dao 만들기
+	2-1. 게시물 목록을 보여주는 viewPage listBoard.jsp 만들기
+		dao불러와서 table에 뿌려주기
+	2-2. 제목을 누르면 상세정보를 보여주게 
+		제목에다<a href="detailBoard.jsp"></a> 상세정보 경로를  넣어주자
+
+3. 상세정보를 보여주는 Dao만들기
+	-->게시물번호를 매개변수로 전달받아 vo에 정보를 넣어주는 getBoard()만들기
+	3-1. 상세정보를 보여주는 detailBoard.jsp 만들기
+
+4. 상세정보에서 게시글 삭제, 게시글 수정 하는 버튼에 경로를 각각 넣어주어서
+	dao를 실행시키자
+
+4-1. 삭제하기
+	4-1-1. 암호를 입력받아(deleteBoard.jsp) 같으면 
+	4-1-2. deleteBoard() 메소드(sql = "delete board where no=?";)
+		를 사용해 삭제하는 deleteBoardOk.jsp만들기 
+
+4-2. 수정하기
+	4-2-1. 게시글번호를 입력받아 그 번호를 매개변수로 가지는 vo를 불러들인다음
+		수정하고싶은 속성에 다시 입력값을 받는다(updateBoard.jsp)
+	4-2-2. updateBoardOk.jsp 에서는 
+		updateBoard() 메소드(sql = "update board set title=? ... where no=? and pwd=?";)
+		를 사용해 수정해준다
+	

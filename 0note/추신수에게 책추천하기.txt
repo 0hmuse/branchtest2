@@ -1,0 +1,341 @@
+연습) '추신수'고객에게는 어떤도서를 추천해야 구매할 확률이 높을까요?
+	생각해봅시다.
+	(나와 비슷한 구매이력이 있는 사람이 구매한 도서중 내가 구매하지 않은 도서)
+
+---> '추신수'가 산 책을 산 다른 사람이 산 책을 추천받는다
+
+select bookname from book where bookid = (select custid from customer where name='추신수');
+select custid from customer where name='추신수';
+
+
+---> '추신수'고객과 같은 도서를 구매한 고객의 id를 출력
+select c.custid, orderid
+from orders o, customer c, book b 
+where c.custid=o.custid and b.bookid=o.bookid and
+bookname = ();
+
+
+---> '추신수'와 같은 도서를 구매한 고객중 
+	고객 아이디별 동일한 도서를 구매한 수 출력
+
+
+
+---> '추신수'와 같은 도서를 구매한 고객중 
+	구매한 건수가 많은 상위 2명의 고객 id를 출력
+	(만약, 2번째 고객의 구매건수와 동일한 고객을 포함합니다)
+	==> A
+
+
+---> A의 고객이 구매한 도서중에 '추신수'가 구매하지 않은 도서 출력
+
+
+
+==> 고객명을 입력받아 그 고객에게 추천할 도서를 출력하는 웹어플리케이션을 작성
+
+
+
+
+
+
+
+
+
+******************************************************************************************
+연습) '추신수'고객에게는 어떤 도서를 추천해야 구매할 
+			확률이 높을까요? 생각해 봅니다.
+
+- '추신수'가 구매한 도서의 id를 출력
+	 select bookid from orders where 
+	 	custid = (select custid from customer where name='추신수');
+	===> list
+BOOKID
+------
+     7
+     8
+     1
+
+- '추신수'를 제외한 고객중에 
+		고객id별 list를 구매한 건수를 출력
+     
+select custid, count(*) cnt 
+from customer c, orders o, () list
+where c.custid = o.custid and
+o.bookid = list.bookid and
+name != '추신수'
+group by custid;
+
+
+     
+select c.custid, count(*) cnt 
+from customer c, orders o, (select bookid from orders where 
+	 	custid = (select custid from customer where name='추신수')) list
+where c.custid = o.custid and
+o.bookid = list.bookid and
+name != '추신수'
+group by c.custid
+order by count(*) desc;						===> A
+
+
+=========================================================================     
+A의 결과에 행번호를 붙입니다.
+
+select rownum n, custid, cnt from ();
+
+select rownum n, custid, cnt from (select c.custid, count(*) cnt 
+from customer c, orders o, (select bookid from orders where 
+	 	custid = (select custid from customer where name='추신수')) list
+where c.custid = o.custid and
+o.bookid = list.bookid and
+name != '추신수'
+group by c.custid
+order by count(*) desc);							===> B
+
+
+==============================================================
+B중에 행번호 2번째인 cnt를 출력
+
+select cnt from ()
+	where n = 2;
+
+
+select cnt from (select rownum n, custid, cnt from (select c.custid, count(*) cnt 
+from customer c, orders o, (select bookid from orders where 
+	 	custid = (select custid from customer where name='추신수')) list
+where c.custid = o.custid and
+o.bookid = list.bookid and
+name != '추신수'
+group by c.custid
+order by count(*) desc))
+	where n = 2;								===> C
+
+    
+    
+==============================================================================
+B에서 cnt c보다 크거나 같은 custid를 출력
+
+select custid from () where cnt >= ();
+
+
+select custid from (select rownum n, custid, cnt from (select c.custid, count(*) cnt 
+from customer c, orders o, (select bookid from orders where 
+	 	custid = (select custid from customer where name='추신수')) list
+where c.custid = o.custid and
+o.bookid = list.bookid and
+name != '추신수'
+group by c.custid
+order by count(*) desc)) where cnt >= (select cnt from (select rownum n, custid, cnt from (select c.custid, count(*) cnt 
+from customer c, orders o, (select bookid from orders where 
+	 	custid = (select custid from customer where name='추신수')) list
+where c.custid = o.custid and
+o.bookid = list.bookid and
+name != '추신수'
+group by c.custid
+order by count(*) desc))
+	where n = 2);										===> D
+	
+==============================================================================
+
+D가 구매한 도서목록 minus 추신수가 구매한 도서모록
+
+select bookid from orders 
+	where custid in ()
+minus
+select bookid from orders 
+	where custid = (select custid from cutomer where name = '추신수');
+	
+
+
+select bookid from orders 
+	where custid in (select custid from (select rownum n, custid, cnt from (select c.custid, count(*) cnt 
+from customer c, orders o, (select bookid from orders where 
+	 	custid = (select custid from customer where name='추신수')) list
+where c.custid = o.custid and
+o.bookid = list.bookid and
+name != '추신수'
+group by c.custid
+order by count(*) desc)) where cnt >= (select cnt from (select rownum n, custid, cnt from (select c.custid, count(*) cnt 
+from customer c, orders o, (select bookid from orders where 
+	 	custid = (select custid from customer where name='추신수')) list
+where c.custid = o.custid and
+o.bookid = list.bookid and
+name != '추신수'
+group by c.custid
+order by count(*) desc))
+	where n = 2))
+minus
+select bookid from orders 
+	where custid = (select custid from customer where name = '추신수');		
+	
+			
+										===> E
+										
+										
+======================================================================
+
+도서번호가 E에 해당하는 도서번호, 도서명, 출판사, 가격을 출력
+
+select bookid, bookname, publisher, price 
+from book
+where bookid in (select bookid from orders 
+	where custid in (select custid from (select rownum n, custid, cnt from (select c.custid, count(*) cnt 
+from customer c, orders o, (select bookid from orders where 
+	 	custid = (select custid from customer where name='추신수')) list
+where c.custid = o.custid and
+o.bookid = list.bookid and
+name != '추신수'
+group by c.custid
+order by count(*) desc)) where cnt >= (select cnt from (select rownum n, custid, cnt from (select c.custid, count(*) cnt 
+from customer c, orders o, (select bookid from orders where 
+	 	custid = (select custid from customer where name='추신수')) list
+where c.custid = o.custid and
+o.bookid = list.bookid and
+name != '추신수'
+group by c.custid
+order by count(*) desc))
+	where n = 2))
+minus
+select bookid from orders 
+	where custid = (select custid from customer where name = '추신수'));
+
+=======================================================================================================================
+
+
+제일 많이 팔린책 3권 뽑기
+
+select bookid, count(*) cnt from orders group by bookid order by cnt desc; --> 책별로 팔린 책 수를 bookid로 나타냄
+
+select rownum n, bookid, cnt  from (select bookid, count(*) cnt from orders group by bookid order by cnt desc);
+--> 거기에 n 을 붙였음
+
+select bookid, cnt 
+from (select rownum n, bookid, cnt  from (select bookid, count(*) cnt from orders group by bookid order by cnt desc))
+where n<=3;
+--> top3의 bookid 나옴
+
+BOOKID        CNT
+------ ----------
+    10          4
+     1          3
+     5          2
+
+
+
+추신수가 산 bookid
+select bookid from orders where custid = (select custid from customer where name ='추신수');	==> A
+BOOKID
+------
+    10
+     1
+     7
+     8
+     5
+
+전체목록에서 A를 제거한 도서id	//추신수가 구매하지않은 도서id의 목록
+select bookid from book
+minus
+select bookid from orders where custid = (select custid from customer where name ='추신수');	==> B
+
+
+B와 orders를 join하여 bookid별로 구매수량을 출력(book에 있는 모든 책)
+
+select b.bookid, count(*)  
+from (B) b left outer join orders o
+on b.bookid=o.bookid
+group by b.bookid
+order by count(*) desc;
+
+
+select b.bookid, count(*)  
+from (select bookid from book
+minus
+select bookid from orders where custid = (select custid from customer where name ='추신수')) 
+b left outer join orders o
+on b.bookid=o.bookid
+group by b.bookid
+order by count(*) desc;
+==> C
+
+
+
+C결과에 행번호를 붙여 3이하인 도서번호를 출력
+select bookid 
+from (C)
+where rownum <= 3;
+
+select bookid 
+from (select b.bookid, count(*)  
+from (select bookid from book
+minus
+select bookid from orders where custid = (select custid from customer where name ='추신수')) b left outer join orders o
+on b.bookid=o.bookid
+group by b.bookid
+order by count(*) desc)
+where rownum <= 3;			==> D
+
+
+
+도서번호가 D에 해당하는 도서의 정보를 출력
+select * from book
+where bookid in (D);
+
+select * from book
+where bookid in (select bookid 
+from (select b.bookid, count(*)  
+from (select bookid from book
+minus
+select bookid from orders where custid = (select custid from customer where name ='추신수')) b left outer join orders o
+on b.bookid=o.bookid
+group by b.bookid
+order by count(*) desc)
+where rownum <= 3);
+
+
+
+
+
+
+=======================================================================================================================
+
+
+
+
+select bookid from orders where custid = (select custid from customer where name ='추신수');	
+minus
+select bookid, bookname, publisher, price from book
+where bookid in (select bookid
+from (select rownum n, bookid, cnt  from (select bookid, count(*) cnt from orders group by bookid order by cnt desc))
+where n<=3);
+--> 그 top3의 책정보 출력
+
+
+
+select bookid, bookname, publisher, price from book
+where bookid in (select bookid
+from (select rownum n, bookid, cnt  from (select bookid, count(*) cnt from orders group by bookid order by cnt desc))
+where n<=6)
+minus
+select bookid from orders where custid = (select custid from customer where name ='추신수');
+
+
+
+
+select*from book;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

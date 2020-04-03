@@ -1,0 +1,6 @@
+http://192.168.0.24:8088/admin/EmpTest.html
+http://192.168.0.24:8088/all/DeptTest.html
+
+master 현성->list
+work1 지연->insert
+work2 도형->update

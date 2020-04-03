@@ -1,0 +1,20 @@
+javax.swing
+
+- JCheckBox
+AbstractButton의 후손임
+boolean	isSelected()
+Returns the state of the button.
+(선택,해제 판단)
+
+
+- JRadioButton
+동시에 선택 없음
+// ButtonGroup !!
+
+
+- JButton
+public void setRolloverIcon(Icon rolloverIcon)
+	-> 마우스가 위에올라가면 아이콘이 바뀜
+
+
+- JTabbedPane

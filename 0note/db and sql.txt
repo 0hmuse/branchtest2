@@ -1,0 +1,124 @@
+--------------------<<< 데이터 베이스 접속하기 >>>----------------------------
+sqlplus
+system
+manager
+
+계정 새로만들기
+create user c##새로운아이디 identified by 암호
+
+권한부여
+grant connect, resource, dba to c##새로운아이디
+
+계정 바꾸기
+conn c##새로운아이디/암호
+
+-------------------------<<< 서브쿼리 >>>----------------------------------
+sql문 안에 sql
+
+
+-------------------------<<< 제약의 종류 >>>-------------------------------
+(설정해준 제약으로 컬럼자료형을 insert할 수 있다)
+
+null		값을 생략할 수 있어요
+not null	값을 생략할 수 없어요
+unique		값이 유일해야해요
+default		값을 생략하면 기본값을 적용해요
+check		조건식을 만족하는 값이여야 해요
+primary key	값을 생략할 수 없고 유일해야 해요(not null+unique)
+foreign key	관계에 있는 부모객체의 주식별자에 나타난 값만 허용해요
+
+desc user_constraints 	오라클이 제공하는 제약사전
+select constraint_name, constraint_type, table_name from user_constraints;
+	제약이름	제약종류	  테이블이름
+
+------------------------------<<< 명령어들 >>>--------------------------------
+1.DDL	데이터정의어(데이터베이스를 생성하거나 구조를 변경하는 명령어)
+2.DCL	데이터제어어(사용자 권한을 부여하거나 제거하는 명령어)
+3.DML	데이터조작어(데이터를 추가,수정,삭제,조회하는 명령어)
+								- 데이터 추가	insert ~
+								- 데이터 수정	update ~	
+								- 데이터 삭제	delete ~
+								- 데이터 검색	select ~
+
+새로운		create table 테이블명(속성 자료형);
+테이블								  < 다중행 영산자: 서브쿼리의 건수가 여러건일때 사용 >	
+만들기								    in, any, some, all, exisits
+								     =, <, >, <=, >=
+		select 컬럼 (sql) from 테이블명 (sql) 에칭가능 where 조건식 (sql)
+
+자료넣기	insert into 테이블명 values(속성내용들);
+		insert into 테이블명(속성 자료형) values (속성내용들);
+테이블내용	select 컬럼1,컬럼2 ... from 테이블명;
+보여줘		모든컬럼 다 보여줘 selelct * from 테이블명;		
+
+테이블삭제	drop table 테이블명;
+컬럼수정	update 테이블명 set 컬럼1=값1 where 조건식;
+컬럼명 수정	alter table 테이블명 rename column 원래컬럼명 to 바꿀컬럼명; 
+컬럼삭제	delete 테이블명 where 조건식;
+(레코드삭제)
+구조변경	alter table 테이블명 add	새로운 컬럼 추가
+				     drop	컬럼 삭제
+				     modify	컬럼 수정
+~~컬럼별로	group by 컬럼
+		--> 집계함수(sum,avg,max,min,count)를 특정 컬럼의 값의 종류별로 나타내고자 할때 사용
+		(group by절에 나타난 결과에 조건식을 적용) having 조건식;
+view생성	create view view이름;
+view삭제	drop view view이름;
+view다시만들기	create or replace view view이름;
+정렬출력	order by asc(오름차순),edsc(내림차순)
+특정패턴	~~~ like %(여러글자), _(한글자)
+중복을제거	distinct 컬럼명
+
+화면정리	cl scr;	
+테이블구조보기	desc 테이블명;
+
+적용시키기	commit;		-> DML(insert, pudate, delete) 반영
+취소		rollback;	-> DML(insert, update, delete) 취소
+
+포맷출력변경	ed 파일명 -> 메모창이 뜨면 -> column 컬럼 format a10;		-> 문자열
+					      column 컬럼 format 9999.99;	-> 숫자 
+포맷변경적용	@파일명
+
+print하려면	set serveroutput on;
+
+<< 번호 알아서 증가하게 하는 시퀀스 >>---------------------------------------------------
+시퀀스만들기#1	create sequence 시퀀스명 start with 100 step 10;
+		--> 100부터 10씩 증가
+시퀀스만들기#2	create sequence 시퀀스명;
+		--> 1부터 1씩증가
+시퀀스만들기#3	create sequence 시퀀스명 start with 11;
+		--> 11부터 1씩증가
+시퀀스적용	시퀀스명.nextval	--> 다음번호생성
+(쿼리문에)	시퀀스명.cuurval	--> 현재번호 확인
+
+
+
+그외,
+outer join -> 조건에 적합하지않아도 테이블에있는 모든데이터를 출력해줘
+from table1 right/left outer join table2
+where -> on
+
+셀프조인 -> 하나의 개체(table)에서 어떤 속성이 자신의 주 식별자를 참조하는 경우에 사용
+
+2개이상의 테이블로부터 데이터를 검색하려면 조인식(조건식)을 표현해야한다
+	--> 각각의 테이블에 공통으로 들어가는 컬럼으로 조인식 표현하기
+
+집계함수
+	sum(컬럼)	컬럼의 총 합
+	avg(컬럼)	컬럼의 평균
+	max(컬럼)	컬럼의 가장 큰 값
+	min(컬럼)	컬럼의 가장 작은 값
+	count(컬럼)	컬럼의 수
+	count(*)	모든 수
+
+
+
+<< 부모,자식 관계의 테이블 생성 >>
+book, customer table은 이미 생성했음
+그 두테이블과 관계를 맺을 새로운 order table을 생성해보자
+create table orders(orderid number primary key,	     --> 부모개체(table)의 주식별자(custid)만이 관계를 설정할 수 있다
+		custid number references customer(custid), 
+		bookid number references book(bookid), 
+		saleprice number ,		--> 부모개체(book)의 주식별자(bookid)만이 관계를 설정할 수 있다
+		orderdate date);
+

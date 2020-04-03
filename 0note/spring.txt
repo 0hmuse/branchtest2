@@ -1,0 +1,472 @@
+<< 프레임워크(ftamwork) >>
+	- 어플리케이션을 구현하기에 용이한 뼈대를 말합니다.
+	 
+<< spring >>
+	- 프레임워크 종류 중 하나입니다.
+	- 프레임워크 중에 전세계적으로 널리 애용되는 것은
+		spring, struts등이 있습니다.
+	- 우리나라 공공프로젝트는 전자정부표준프레임워크에
+		spring, mybatis가 표준으로 채택되어있어요.
+	
+<< 스프링의 주요 특징 >>
+1. DI(의존성 주입)
+	자바로 만들어진 SW속을 들여다 보면 수많은 클래스로 구성되어 있습니다.
+	이 클래스들은 서로 관계에 있는데 그 중에서도 has a 관계는 
+	어떤 클래스가 다른 클래스의 member변수가 되는 것을 말합니다.
+	
+	예를들어)
+	class A{
+		B ob;
+	}
+	B클래스 변수 ob는 A클래스의 멤버입니다.
+	이것을 A has a B라고 표현합니다.
+
+	B클래스 입장에서 A클래스를 사용하려면 
+	코드 어딘가에 'ob = new B()'라고 객체를 생성하는 문장이 있어야 할 것입니다. 
+	
+	그런데 만약 우리의 고객이 A의 멤버 B를 C로 변경해 달라고 요청한다면
+	new B()라고 되어있는 코드를 찾아서 new C()로 직접 고쳐야 할 것 입니다.
+	이 B가 A뿐만아니라 다른 곳에서 사용되었다면, 일일이 관련 코드를 찾아 바꾸기란 쉽지않아요.
+	또, 미쳐 바꾸지 못한 부분이 있을수도 있어요.
+
+	이와 같이
+	코드 내에 직접 new B()라고 되어있는 부분을 ==> "강한 의존관계"에 있다고 합니다.
+
+	우리는 사용자의 빈번한 수정에 대한 요구에 유연하게 대처하기 위하여
+	스프링환경설정에 의하여 "느슨한 의존관계", "의존 관계 자동 설정"을 이용하려고 합니다.
+
+	즉, 스프링 환경설정파일(xml, 어노테이션)에 의하여
+	어플리케이션에서 필요한 객체를 제공하여 의존관계를 설정하려고 합니다.
+	이렇게 하면 사용자의 빈번한 수정이 있어도 일일이 찾아서 코드를 수정하지 않아도 됩니다.
+	환경설정파일 (xml, 어노테이션)만 수정해주면 됩니다.
+
+
+
+2. AOP(나중에~)
+
+---------------------------------------------------------------------------------------------------
+클래스를 사용할때 객체를 만들어야함
+
+자바는 - 수많은 클래스로 구성되어있다. 그 클래스들은 관계를 이루는데 크게 2가지
+is a	: 상속관계
+has a	: 부속품...
+
+A와 B가 has a 관계라면
+B가 A에 부속품이라면 A안에 new B 로 객체를 생성해야한다
+수많은 new B를 모두다 수정하기에 힘들다면....
+
+spring환경설정(DI)에서 new B를 실행해준다~
+---------------------------------------------------------------------------------------------------
+
+day0219
+page26~~~
+
+id = 생성할 객체이름
+xml파일 객체를 생성해서 파일을 읽어와야 한다 => FileSystemResource(".xml");
+
+객체를 제공해주는 컨테이너의 가장 조상 = BeanFactory을 통해서
+Object = factory.getBean("id명"); --> 그래서 원하는 형으로 캐스팅해주어야함
+
+==> 자바어플리케이션에서 spring환경 만들기~
+lib에 jar들	Java Bulid Path -> Libraries -> classpath -> Add External Jars... 에 추가하기
+-> 인터페이스 만들기 ->
+
+이클립스에 xml템플릿을 만들어주는 설정을 해주어야 함
+스프링환경설정
+헬프 -> 밑에서 네번째 install new softrware
+http://dist.springframework.org/release/IDE 엔터
+입력해서 첫번째 코어만 선택하기 -> next -> 재시작하고 -> new 에 spring생김 -> 거기서 xml만들어주는 파일 선택해서 id랑 class입력하기
+
+
+
+xml에서~ 
+constructor-arg		: 생성자 일때
+property		: setter 일때
+
+scope="singleton" --> 기본임. xml을 읽어올때 객체를 생성하게 됨
+scope="prototype" --> .getBean() 할때 객체 생성해줘
+
+------------------------
+diTest04
+exam04	: xml -> @
+exam05	: @ -> xml
+------------------------
+
+==> 웹어플리케이션에서 spring환경 만들기~
+항상하던데로 lib폴더에 넣어주기~
+
+
+day0220
+Spring MVC
+--> 우리가 만들었던 BitController의 역할을 해주는친구
+
+스프링 MVC의 주요 구성 요소(pfd 스프링MVC)
+BitController == **DispatcherServlet(FrontController)
+propertyFile  ==   HandlerMapping
+Action        ==   컨트롤러(Controller)
+		   ModelAndView -> 무엇을(model)가지고 어디로(view)갈지 실어줌
+		   ViewResolver -> 늘 언제나 확장자와 경로가 동일하다면 
+		   뷰(View) -> .jsp
+
+page6
+<< DispatcherServlet의 환경설정 >>
+서블릿이름(A)은 마음대로 줄수 있지만
+서블릿이랑 서블릿맵핑(A)의 이름은 같아야 하고
+<url-pattern>요청할 것(*.do)</url-pattern>
+특정요청 하나는 /
+모든거~할때는 /없이 
+
+--> A-selvlet.xml	: 설정파일로 사용하게 됨.
+			: WEP-INF에 만들어주어야함
+			: Controller 객체를 만들어주는 곳, 뿐만아니라 모든 객체를 new 해줄때 여기서 만들어 주자!
+
+page7
+<< 컨트롤러 구현 및 설정 추가 >>
+.setAttribute(변수명,값);; == .addObject(변수명,값);
+
+page8
+<< ViewResolver >>
+
+page9
+<< view >>
+
+
+page11 - 실행흐름 정리
+
+===========================================================================================================================================
+<< 스프링 기반 웹어플리케이션 만들기 - ex)모든 고객목록을 출력해보자!>>
+
+1. 새로운 프로젝트 만들때 web.xml(Spring에서 제공)추가해주기
+2. lib폴더에 모든 자르들 넣기
+3. 고객목록을 반환하는 Dao를 만들기(vo,db 등등 선작업을 해준다)
+
+4. web.xml에 **Dispatdcher Servlet설정해주기(servlet, servlet-mapping)
+	  <servlet>
+		<servlet-name>이름</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		// DispatcherServlet다른 jsp가서 자동완성 해주어서 import주소 가져오기
+	  </servlet>
+	  
+	  <servlet-mapping>
+		<servlet-name>이름</servlet-name>
+		<url-pattern>*.do</url-pattern>
+	  </servlet-mapping>	
+
+5. 4번에서 만든 이름으로 이름-servlet.xml 만들어주기
+	(여기서 객체생성할꺼야, 
+		그리고 viewResolver(IRVR 자동완성)만들어준다)
+		--> 파일명만 입력하면 자동으로 찾아주게 해주는거
+				<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+					<property name="prefix" value="/WEB-INF/views/"/>	//경로
+					<property name="suffix" value=".jsp"/>			//확장자
+				</bean>
+			
+6. Controller역할을하는 CustomerController를 만들어준다
+	이때, @Controller(class), @RequestMapping(메소드())해주어야함
+		mav.setViewName("listCustomer");
+		mav.addObject("list", dao.listCustomer());
+
+7. 6번에서 **Dao를 멤버로 해서 관계를 설정해준다 
+	--> 이름-servlet.xml에서 객체도 생성해주고 CustomerController와 관계를 설정해준다
+8. 6번을 꾸며준다~ 
+9. jsp를 꾸며준다
+===========================================================================================================================================
+
+*** 실습 ==> ex) customerTest ***
+
+// dao에서
+insert, update(CustomerVo c)
+ArrayList<CustomerVo>()
+delete(int custid)
+getCustomer(int custid)
+
+==========================================
+
+<< mybaits를 적용하~~~ >>
+
+---------------------------------------------------------------------------------------------------
+day0221
+1. web-inf의 jar넣기
+2. web.xml 설정 --> DispatcherServlet 설정해주기
+3. class이름 오타날수 있으니 jsp에 dispatcherServlet 자동완성해서 가지고오기
+4. inport된 걸 class에 넣기 (얘를 쓰겠다고 spring에 등록하는거)
+5. 이름은 내마음대로
+6. 어떤걸 맡아서 처리할껀지는 servlet-mapping에 다가 설정 url-pattern
+7. 한글세팅하는 filter(CharacterEncodingFilter IMPORT해서 class가져오기)
+	<filter>
+		<filter-name></filter-name>
+		<filter-class></filter-class>
+		<init-param>
+			<param-name></param-name>
+			<param-value></param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name></filter-name>
+		<url-pattern></url-pattern>
+	</filter-mapping>
+
+8. web.xml에서 정해준 이름으로 이름-servlet.xml
+9. 이름-servlet.xml 설정해주기
+	- 자동으로 객체생성하기해주기 위해 xmlns(xmlNameSpace)에 context설정해주기
+	- 자동으로 객체생성해주고싶은 애들 경로 정해주기
+	- viewResolver(파일이름만 써주면 자동으로 경로 설정해주는거)-> 설정해주기
+
+10. com.bit.controller --> 만들어주기
+	- ModelAndView를 통해서 무엇을 어디로 가지고 갈껀지 설정해주기
+
+
+11. com.bit.db 에 mybaits설정을 해주자
+	--> 공식홈피를 이용하자
+
+12. sqlMapConfig.xml 파일안에 홈피에있는거 가져오기(db연결해주기 위해 아이디설정)
+13. db.properies	
+	genenal(에 db연결하는애들 넣어주기 내가 사용하는 driver, url. user, pwd 등 입력해주기)
+
+14. sqlMapConfig.xml 에 13.경로 설정
+	<properties resource="com/bit/db/bit.properties"/>
+		마지막 mapper경로도 설정
+		그 이름으로 .xml 파일 만들어주기
+		mapping경로 애칭줄수 있어
+			<typeAliases>
+				<typeAlias type="com.bit.vo.CustomerVo" alias="customerVo"/>
+			</typeAliases>
+
+15. CustomerMapper.xml 도 
+	샘플복사해서 자동으로 CustomerVo로 담아주고, sql설정해주기
+
+		(id: sql이름, resulType: 어떤자료형으로 담아줄까, namespace: 애칭 ) 
+		<mapper namespace="customer">
+		  <select id="selectAll" resultType="customerVo">
+		    select * from customer
+		  </select>  
+		</mapper>
+		insert, delete, update, select 각각 다 할 수 있음 
+
+16. dao와 mapping 파일 사이에 연결을해주는 
+	CsutomerManager에 factory를 이용하여 
+	com/bit/db/sqlMapConfig.xml 
+	안에있는 sql을 맵핑해서	List에 담아준다 -> 를 설정해준다
+
+
+sql -> CsutomerManager -> CustomerDao -> CustomerController에서 ModelAndView
+(CustomerMapper)
+
+controller -> manager(factory 생성하고 그걸 이용하기, static) -> dao
+
+*** Vo -> Mapper -> Manager -> Dao -> controller (순으로 해주자, 근데 다른순서로 해도 상관없음)
+
+상세보기
+- mapper에 상세보기할 sql노드(select, insert, update, delete) 추가해주기
+- 매니저에가서 메소드만들어주기
+---------------------------------------------------------------------------------------------------
+
+한글이 깨져요!
+1. server.sml
+	<Connector URIEncoding="UTF-8" 
+	connectionTimeout="20000" 
+	port="8080" 
+	protocol="HTTP/1.1" 
+	redirectPort="8443"/>
+
+2. web.xml에 필터 설정을 확인합니다
+	<filter>
+		<filter-name>enc</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+	
+
+3. jsp의 encoding확인하기
+머리에 
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+확인하기
+
+
+day0224
+// 도서등록, 수정, 삭제, 목록, 검색, 정렬에 대한 기능을 구현해 봅시다
+bitTest -> book
+
+<< 정렬하기 >>
+1.	BookMapping.xml
+	select*from book sql문에~ 
+	order by ${컬럼명변수} 추가해줌(마지막에)
+
+2.	list에서 컬럼명에 링크걸어준다
+	<a href="listBood.do?컬럼명변수=컬럼명></a>
+	....
+
+3.	<a href="listBook.do?sortColumn=bookid">책번호</a>
+	====>BookMapping.xml에서~
+		<if test="sortColumn != null">
+		order by ${sortColumn}
+		</if>
+
+
+<< 검색하기 >>
+1.	BookMapping.xml
+	select*from book sql문에~
+	where ${검색할컬럼} like '%' || #{검색할단어} || '%'
+	where ${searchColumn} like '%' || #{keyword} || '%'
+	변수는 ${} / 컬럼명은 '?' 을대신해서 #{}
+	
+2.	list에서 검색할 form을 만들어준다
+	<form action="listBook.do">
+		<select name="searchColumn">
+			<option>도서번호</option>
+			<option>도서제목</option>
+			<option>출판사</option>
+			<option>가격</option>
+		</select>:<input type="text" name="keyword">
+		<input type="submit" value="검색">
+	</form>
+
+3.	====>BookMapping.xml에서~
+검색	<if test="keyword != null and keyword != ''">
+정렬   		where ${searchColumn} like '%' || #{keyword} || '%'   		
+	</if>
+
+	<if test="sortColumn != null">
+			order by ${sortColumn} 
+	</if>
+	여기서! 검색은 정렬 앞쪽에 위치하게 해준다~
+	검색을하고 정렬을 해야하기 때문
+
+<< 검색&정렬 >>
+검색하고 정렬하는건 모두 list에서 해줄거기 때문에 
+Controller에서 listAll에 추가해주면 됨
+1.	매개변수 String keyword, String searchColumn, String sortColumn, HttpSession session
+2.	얘네를 모두 Hashmap<String, String>map = new Hashmap(); 에다 넣어줄꺼임
+3.	map.put("keyword", keyword);
+	map.put("searchColumn", searchColumn);
+	map.put("sortColumn", sortColumn)'
+4.	그리고 검색후 정렬을 유지시켜주기 위하여
+		if(keyword == null) {			
+			keyword = (String)session.getAttribute("keyword");
+			searchColumn = (String)session.getAttribute("searchColumn");
+		}
+	과
+		session.setAttribute("searchColumn", searchColumn);
+		session.setAttribute("keyword", keyword);
+
+		를 추가해줌! 순서가 중요하다
+
+-------------------------------------------------------------------------------------------------------------
+day0225
+
+sts설정
+oracle driver
+mtbatis framwork
+spring web
+-------------------
+
+<< jsp를 사용하겠다는 설정 >> :원래는 권장하지 않음
+application 설정 -> src/main/resources -> application.properties
+jsp를 사용하기 위한 메이븐 설정 -> pom.xml
+
+<< STS 툴 >>
+Spring Tools Suite
+	: 스프링 개발을 쉽게 하기 위한 도구
+	==> Spring boot환경에서 실행하기를 권장함.(알아서 jar를 다운받아줌)
+	     스프링 개발을 위한 환경설정을 더 쉽고 빠르게 할 수 있는 환경을 제공해준다
+
+-------------------------------------------------------------------------------------------------------------
+// 사원번호, 사원명, 부서명, 직급, 관리자명, 급여, 수당, 실수령액, 근무지, 입사일
+테이블 2개에 있는 컬럼명을 모두 출력하고싶을때	-> veiw만들기
+
+*** 두개의 테이블을 조인해서 내가 원하는 컬럼명으로 조회하고 싶다면
+view를 만들어서 테이블을 만들어준다 -> 그 정보로 vo만들어서~~~ dao, controller, manager 진행해주면 됨
+
+create view EmpView as
+select e.eno, e.ename ename, dname, e.jab, m.ename mname, e.sal, e.comm, e.sal+e.comm total, dloc, e.hiredate
+from emp e, emp m, dept d
+where e.mgr=m.eno and d.dno=e.dno
+
+-------------------------------------------------------------------------------------------------------------
+*** 콤보박스 만들어서 데이터에있는 컬럼명으로 검색하기
+	<form action="empViewList.do">
+		<select name="searchColumn"> -->  
+			<option value="mname">관리자명</option>
+			<option value="jab">직급</option>
+			<option value="dloc">부서위치</option>
+			<option value="dname">부서명</option>
+		</select>:<input type="text" name="keyword"> --> value가 여러개라서 keyword로 묶어줌
+		<input type="submit" value="검색">
+	</form>
+	==> controller에서!! 부터 searchColumn, keyword, sortColumn 들을 map에다 실어서 이동시키자
+		/ HttpSession 을 이용하면 상태유지 시켜줄수 있음(검색후 그 상태를 유지한다음에 정렬하기)
+-------------------------------------------------------------------------------------------------------------
+
+day0226 //pdf 4 스프링 MVC PFAE40
+stsTest --> goodsTest02
+*** 스프링에서 파일 업로드
+--> 업로드할 파일
+사진 업로드, 수정, 삭제...
+
+===> "multipartResolver" 클래스를 만들어주어야 함
+	@Configuration
+	public class SpringConfig {
+		@Bean
+		public CommonsMultipartResolver multipartResolver() {
+			return new CommonsMultipartResolver();
+		}
+	}
+	===> 꼭 이 형태로 만들어야 함!!!
+
+
+	* Vo에 uploadFile필드 하나더(uploadFile) 만들어줘서 거기에 사진내용을 담아야함
+		fname은 사진의 제목 즉, String형으로 된 text임
+		uploadFile은 사진의 내용물임
+	* insert할때 name = uploadFile 로 해주어서 넣어주고 
+	* controller에서 insert(GoodsVo g)해줄때 처리해줌 db에 잘 들어가게, form안에 enctype="multipart/form-data"
+	*	String path = request.getRealPath("img");		// 사진이 올라가는 실 경로(폴더img로해줌)
+		System.out.println("path: " + path);			// 를 출력함, 그럼 저 경로안 폴더에 업로드한 사진이 올라가있음(확인해주기)
+		MultipartFile uploadFile = g.getUploadFile();		// 파일의 실 내용을 uploadFile에 싣고
+				
+		String name = uploadFile.getOriginalFilename();	// 그 uploadFile의 제목(String)은 fname에 싣는다
+				
+		g.setFname(name);					// 그걸 다시 fname으로 set해줌
+	* uploadFile은 byte형으로 바꿔서 저장
+
+	try {	
+			byte[]data = uploadFile.getBytes();		// 위에서는 uploadFile의 이름을 정해줬다면 얘는 데이터형에 맞게 해준다(예외를안고있음)
+			// insert에 성공하면(db에 들어간다) 파일내용 복사하는걸로...			
+			
+			FileOutputStream fos = new FileOutputStream(path+"/"+fname);
+			fos.write(data);
+			// 파일내용은 fos를 통해서 씌여진다
+		}catch (Exception e) {
+			// TODO: handle exception
+			System.out.println("예외발생: " + e.getMessage());
+		}
+
+*** 페이징처리하기
+jsp.txt에 있음
+
+
+day0227
+게시판 답글처리!
+jsp.txt
+
+다음주에~
+게시판 등록, 목록보기, 삭제, 수정, 답글달기, 페이징처리. 
+
+????서버를 새로 킨 상태에서는 삭제가 됨
+근데 껏다가 다시 킨다음에 하면 삭제가 안됨...
+그리고 수정할때 파일 바꾸면 그 전 파일삭제가 안됨...
+
+day0228
+book 등록, 목록보기, 주문하기
+goods 상품조회, 등록...
+emp, dept 사원조회, 등록
+board 조회, 목록, 파일업로드...
+
+- spring 책pdf
+- spring boot 기본설정
+- sql문
+- table만들기~
+

@@ -1,0 +1,35 @@
+<< 정규표현식 >>=========================================================================
+https://ko.wikipedia.org/wiki/%EC%A0%95%EA%B7%9C_%ED%91%9C%ED%98%84%EC%8B%9D#%EA%B8%B0%EB%B3%B8_%EA%B0%9C%EB%85%90
+
+regular expression (regexp)
+특정한 규직을 가진 문자열의 집합
+// 많은 데이터중에 내가 원하는것만 취하고 싶을때
+// 패턴(규칙,원칙)을 지정해주고 그걸 따르게함 
+
+
+	JAVA menual
+	java.lang string		예제) day1227 CellPhoneTestRex
+matches(String regex)
+		정규표현식을 넣어줌
+		Tells whether or not this string matches the given regular expression.
+
+
+<< String >>=============================================================================
+String		문자열이 변하지않음
+StringBuffer	문자열이 변함
+StringBuilder
+
+
+<< 문자열 처리 >>========================================================================
+자바에서는 문자열 처리를 위해여
+	String, StringBuffer, StringBuilder 
+
+	String은 변하지 않는 문자열 처리에 적합합니다.
+	만약, 변하는 문자열 처리를 해야 한다면
+		StringBuffer,와 StringBuilder 를 권장합니다.
+
+StringBuffer String으로 변환하기 위해서는 toString()메소드를 이용합니다.
+
+<< StringTokenizer >>====================================================================
+문자열을 분리할때(빈칸이 디폴트값)		StringTokenizer(String str)
+문자열을 특별한문자로 분리할때()		StringTokenizer(String str, String delim)

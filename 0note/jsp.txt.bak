@@ -1,0 +1,575 @@
+<< 목록을 불러와서 테이블형으로 보여주기 >>
+	
+	<form action="listBook.jsp" method="post">	-=-> listBook.jsp 실행 url도 가능, post 주소창에 데이터안보임
+		<select name="sarchField">	-=-> 콤보박스
+			<option value="bookid">도서번호</option>
+			<option value="bookname">도서이름</option>
+			<option value="publisher">출판사</option>
+		</select>: <input type="text" name="keyword">
+		m>	<input type="submit" value="검색">
+	</for
+		
+	<table border="1" width="80%">	---> 테이블
+		<tr>
+			<td> <a href="listBook.jsp?sortFeild=bookid">도서번호</a></td>		--> href 링크가져오기
+			<td> <a href="listBook.jsp?sortFeild=bookname">도서이름</a></td>
+			<td> <a href="listBook.jsp?sortFeild=publisher">출판사</a></td>
+			<td> <a href="listBook.jsp?sortFeild=price">가격</a></td>
+		</tr>		
+		
+		<%
+			for(BookVo b:list){
+				%>
+					<tr>
+						<td><%= b.getBookid() %> </td>
+						<td><%= b.getBookname()%></td>
+						<td><%= b.getPublisher() %></td>
+						<td><%= b.getPrice() %></td>
+					</tr>
+				<%
+			}
+		%>	
+	</table>
+
+
+
+day0130
+=========================================================================================
+404 에러 --> "문서가 없다"는 에러 
+	===>jsp의 이름이 같은지 확인하고, jsp파일이 WebContent에 있는지 확인하자
+
+jsp설정
+입력을 위한 jsp화면과(form에 만들어준다. 그때, action에 메소드실행을위한 jsp를 넣는다)
+그 입력을 받아서 메소드를 실행하는 jsp를 따로 만들어 줄 수 있다.
+
+<< db에 insert해주는데 메소드만을 위한 jsp만들어줄때 >>
+==> action에 다른 jsp의 경로를 주었을때
+1. 한글설정 --> request.setCharacterEncoding("euc-kr");
+2. 입력한정보를 받는다 request.getParameter() 를 각각의 변수에 담아준다
+							(자료형)
+3. VO 나 MAP을 생성해주면 된다
+4. dao생성해서 insert메소드를 콜한다(vo넣어서)
+4-1. insert메소드가 반환하는 값을 int(성공한 레코드 수)
+5. re가 0보다크면 성공, re가 0보다 작으면 실패
+
+<< 같은jsp에서 action을 불러올때는 >>
+if(request.getMethod().equals("POST")){
+
+}
+
+
+lombok.jar
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+
+
+download cos.jar	--> 파일업로드 구현방법
+
+
+<< jsp >>
+Java Server Page ==> 자바언어로 웹문서(html)를 만들기 위한 기술
+		     그때 jsp에 자바문법, html이 섞여있어서 
+		     M : Model
+		     V : View
+	  	     C : Controller
+		     패턴을 만들었다. 
+controller역할을 일반적으로 서블릿이 담당하게되어서 현재는 서블릿이 중요하게됨
+
+jsp를 만들때 자동으로 서블릿을 만들어준다
+C:\jspTest\.metadata\.plugins\org.eclipse.wst.server.core\tmp0\work\Catalina\localhost\day0204\org\apache\jsp
+이 경로에~ 만약 jsp실행이 잘 안되면 서블릿을 다 삭제해도됨
+다시 jsp를 실행시키면 서블릿이 생김
+
+<< jsp 구성요소 >>
+1. 지시자	<%@ page %>
+		<%@ include %>
+		<%@ taglib %>
+2. 스크립트 릿	<% %>
+3. 표현식	<%= %> 
+4. 선언문	<%! %>
+5. 액션태그	<jsp:uesBean>	: 객체만들어줌
+		<jsp:setProperty>: 만들어진 객체의 사용자의 입력값을 가져옴
+		<jsp:getProperty>: vo의 특정 속성값을 읽어오기위해
+
+		<jsp:include>	: 다른 jsp를 포함 / 서블릿 포함
+		<jsp:forword>	: 다른 jsp로 이동 / 주소표시줄에 노출되지 않는다
+		<jsp:param>	: 위 둘의 액션태그의 자식노드
+				  포함되는문서나 이동되는문서에 전달값이 필요할때
+
+<< jsp 내장객체 >>
+jsp문서에서 사용자가 객체를 생성하지 않아도 기본적으로 사용할 수 있는 객체들을 말합니다.
+
+	request		: 사용자의 요청정보를 담고 있는 객체
+	response	: 응답을 위한 객체
+	session		: 상태유지를 위한 객체
+	out		: 출력담당을 위한 객체
+
+	exception	: 예외정보를 갖고 있는 객체. 일반적으로 생성되지 않으며
+				page지사자에 isErrorPage="true"라고 했을때만 생성되는 내장객체
+	.....
+	===> 사실, 이것들은 서블릿의 로컬 변수들 입니다.
+
+
+
+<< jsp문서에서 예외처리 >>
+jsp문서에서 일반적으로 다음과 같은 오류가 빈번하게 발생됩니다.
+자바문법오류가 발생했을때의 오류코드는 500입니다.
+또, 존재하지않는 문서를 요청했을때의 오류코드는 404입니다.
+
+이 두가지 오류에 대한 처리를 web.xml에 다음과 같이 설정하여 한번에 처리할 수 있어요.
+  <error-page>
+  	<error-code>500</error-code>
+  	<location>/error500.jsp</location>
+  </error-page> 
+  
+  <error-page>
+  	<error-code>404</error-code>
+  	<location>/error404.jsp</location>
+  </error-page>
+
+
+<< 상태유지 기법 >>
+웹문서의 통신규약인 hhttp프로토콜은 "무상태서버"입니다.
+"무상태서버"라고 하는것은 말그대로 상태가 유지 되지 않는 것입니다.
+인터넷상에서 즉 우리가 말하는 인터넷이란 웹을 이야기 하는데요.
+웹에서 문서를 주고받는 규약은 http라고 합니다.
+
+예를들어 우리가 http://www.naver.com에 접속하면
+늘 언제나 네트워크에 연결된 것 처럼 보이지만 사실은 그렇지 않아요.
+웹 어플리케이션은 말이죠, 한번 요청에 의해 응답을 하고 연결이 끊키는 구조입니다.
+늘 언제나 연결이 된다고 생각해보세요. 서버부담이 많을것이야요.
+
+그러니, 웹어플리케이션 입장에서는 사용자의 "상태"를 유지시키기 위한 기법이 필요해요.
+
+이사람이 "로그인을 했는가" "안했는가"
+이사람이 "투표를 했는가" "안했는가"
+이사람이 "몇번째 방문인가?" 등 여러가지
+그 사용자의 상태를 유지시키기 위한 기법이 필요해요.
+
+쿠키	: 사용자의 상태를 사용자 컴퓨터에 기록하는 방식
+		==> 사용자가 임의로 삭제할수 있어 보안유지상 중요한 정보를 기록하기에는 부적합하다.
+			또, 쿠키는 문자열 밖에 저장할 수 없어요.
+
+세션	: 사용자의 상태를 서버의 기록하는 방식
+		==> 내장객체로 제공되어요. 
+			또, String뿐 아니라 온갖자료형을 session에 실을수 있어요.
+			내장객체로 사용해야지만 상태유지가 됩니다.
+			만약 사용자가 직접 생성을 해버리면 상태유지로 사룔할 수 없어요.
+
+< 쿠키의 기록 >
+Cookie 변수명 = new Cookie("쿠키이름","값");
+reponse.addCookie(쿠키변수명);
+
+< 쿠키 읽어오는 방법 >
+Cookie []cookies = request.getCookies();
+for(Cookie co:cookies){
+	if(coo.getName().equals("쿠키이름")){
+		String v = co.getValue();
+	}
+}
+
+
+day0211
+<< 상태유지 기법 >>
+쿠키		: 사용자의 정보를 사용자의 하드디스크에 기록하는 방식
+			문자열만 저장할 수 있어요.
+			
+	쿠키값으로 한글을 저장하려면 다음과 같이 변환한 후 저장해야 해요.
+	URLEncoder.encode(쿠키값, "utf-8");			
+			
+	읽어올때는 다음과 같이 변환후 읽어와야 해요.
+	URLDecoder.decode(쿠키값,"utf-8");		
+	
+	
+			
+
+세션		: 사용자의 정보를 서버에 기록하는 방식
+			내장객체 제공
+			어떤자료형이라도 저장할 수 있어요.
+			
+	세션에 값을 설정하기 위해서는 다음과 같이 사용해요.
+		session.setAttribute(변수명,값);
+		변수명은 문자열
+		값은 어떤자료형이라도 좋아요
+		
+	세션값을 읽어오기 위해서는 다음과 같이 사용해요.
+		session.getAttribute(변수명)
+		
+		getAttribute은 Object를 반환하기 때문에 
+		원하는 자료형으로 변환해서 처리해야 해요.
+
+
+day0212
+<< 게시판 페이징 처리 >>
+저는 게시물 목록에 총 45개의 건수가 있습니다.
+한 화면에 45개가 다 보이니 보기 좋지 않아요.
+한 화면에 보여줄 게시물의 수를 10개씩 출력하고 싶어요~
+다 못보여주는 내용은 화면 하단에 페이지 번호를 출력하고
+해당 페이지 번호를 누르면 그 페이지에 해당하는 게시물목록을
+출력하고 싶어요~
+
+
+1) 페이징처리를 하려면 가장 먼저 "전체레코드 수"는 몇개인지 알아야 한다.
+totalRecord = 45
+
+2) 한 화면에 몇개씩 출력해야하는지 정해야 한다.(내개 정하는 것)
+pageSIZE = 10
+
+3) 전체 페이지 수 계산합니다.
+totoalPage = totalRecord/pageSIZE;
+if(totalRecord%totalPage != 0){
+	totalPage++;
+}-->전체페이지수를 내가정한페이지수로 나누었을때 나머지가 나오면 총 페이지+1을 한다
+	예로 전체페이지수가 45이면 내가 정한 10개만 보여줘로 나누었을때 10.10.10.10.5 이니까 총 페이지수는 5가 되어야함
+
+4) 
+저는 총 43개의 레코드를 갖고 있습니다.
+한 화면에 10개씩 출력하고 싶어요.
+현제 페이지가 1페이지라면 몇번째레코드부터 출력할까요. 
+	시작레코드번호 1 --> 마지막 레코드번호10
+현제페이지가 2페이지라면
+	시작레코드번호 11 --> 마지막레코드번호 20
+현제페이지가 3페이지라면
+	시작레코드번호 21 --> 마지막레코드 30
+
+totalRecord = 45;
+pageSIZE = 10;
+
+pageNUM = 2;
+start = (pageNUM-1)*pageSIZE+1;			end = start+pageSIZE-1;
+
+
+
+(2-1)*10+1 = 11					11+10-1 = 20				
+(3-1)*10+1 = 21					21+10-1 = 30
+(4-1)*10+1 = 31					31+10-1 = 40
+.....						.....
+
+
+5) 현재페이지가 2페이지라고 가정하고 
+start = 11
+end = 20
+사이의 레코드를 출력하는 sql을 작성해보자
+
+select*from board order by no desc;	--> 정렬을 한후에 행번호를 붙여야 한다
+						그 다음 행번호 붙인거에서 원하는 범위의 애들을 뽑아온다
+
+select no,title,writer,pwd,hit,regdate,content,fname,ipAddr from(
+select rownum n,no,title,writer,pwd,hit,regdate,content,fname,ipAddr from (select*from board order by no desc))
+where n between 11 and 20;
+
+
+
+====================================================<< 페이징처리 >>===================================================
+[dao에서 해주어야 할것]
+1> dao에 변수를 지정하자
+totalRecord;	// 내가 가지고있는 전체 레코드수
+pageSIZE;	// 내가 정하는 한 ㅍㅔ이지에 몇개의 목록(혹은상품 등등)을 보여줄껀지
+totalPage;	// 그렇게 되면 그 목록이 몇개인지 (totoalRecord/pageSIZE 요 식으로 구할수 있음)
+
+totalPage = (int)Math.ceil(totalRecord/(double)pageSIZE);
+--> 만약 18개의 레코드수를 5개씩 보여주게하려고 한다면
+	18/5=3.6 이니까 totalPage는 4가 되어야함
+	그래서 Math.ceil(double을 반환함)을 써서 (3.6)올림수를해서 정수(4)가 나오게 하면 됨
+
+2> 전체 레코드수(int)를 반환하는 메소드 정의
+public int getTotalRecord(){
+	String sql = "select count(*) from table명 ";
+}
+
+3> 목록을 반환하는 메소드에서 전체페이지수를 먼저 확인한다. 
+(2번이 잘 되는지 확인하기)
+
+[servlet에서 해주어야함]
+4> totalPage를 상태유지 시켜주자. 
+객체없이 사용할수 있도록 static totalPage를 해주었으니 dao.totalPage로 불러와서 상태유지시켜서 jsp에서 쓸수있게 해준다
+
+[jsp에서 해주어야팜]
+5> 화면 하단에 page번호를 찍어보자
+<c: forEach var="i" begin="1" end="${totalPage}">
+	${i}			---> 1부터 totalPage까지 찍어주자~   1 2 3 4
+</c: forEach>
+
+그리고 그 각각의 페이지안에 pageSIZE만큼 보여주려면~
+[servlet 에서 pageNUM을 설정함]
+6> pageNUM을 받아야 한다.... pageNUM은 그 페이지를 누르면 그 안에 몇개의 목록(상품등등)만 보여준다
+	(최초에 pageNUM은 없기때문에 1로 설정해주고 IF문으로 설정을 해주어야함)
+걔를 int로 받아서 <a></a>를 걸고 그 번호를 누르면 그 번호를 전달받아 리스트업을 해주어야한다 내가정한 pageSIZE만큼~ 
+
+[dao에서 한화면에 총20개중 목록을 4개씩 보여주게끔 변경하려면]
+7> listAll(pageNUM)에 쿼리를 바꿔주어야함
+
+select rownum n,no,item from(
+select*from goods order by no);		--> 번호로 순번을 해준다음 rownum을 붙인다 = A
+
+여기서 (start)부터 (end)번까지 짤라오기
+
+select no,item,price,qty,fname,detail from(
+select rownum n,no,item,price,qty,fname,detail from(
+select*from goods order by no))
+where n between 5 and 8;
+--> "A를 start부터 end까지 짤라서 모든컬럼의 정보를 보여준다" 라는 쿼리를 뽑아야함
+	쿼리를 먼저 확인할때 pageSIZE의 수를 따져서 start와 end의 수를 정해서 확인해보자
+요 쿼리밑에
+int start;
+int end;
+를 설정해 주어야 한다
+			int start = (pageNUM-1)*pageSIZE+1;
+			int end = start+pageSIZE-1;
+			if(end>totalRecord) {
+				end = totalRecord;
+			}				--> 공식...
+====> pageNUM을 전달받으면 공식에의해 결정된 start와 end의 수만큼 쿼리에서 셋 해줌
+	그럼 그 rownum만큼의 목록을 뿌려준다.
+
+그런데 그 페이지수가 많아지면 또 늘어지게되니 그것을 또 pageGROUP시켜주자~ [이전]6 7 8 9 10[다음] --> 요런식으로
+-------------------------------------------------<< 페이징 그룹 처리 >>------------------------------------------------
+7> dao에 pageGROUP이라는 변수설정 : 한화면에 변수값만큼 페이지 수를 보여줘요
+
+8> [서블릿]에서 시작페이지와 마지막페이지 상태유지 시켜주기
+		int startPage = ((pageNUM-1)/dao.pageGROUP)*dao.pageGROUP+1;
+		int endPage = startPage+dao.pageGROUP-1;	
+		if(endPage>dao.totalPage) {
+			endPage = dao.totalPage;
+		}					--> 공식...같은거
+
+9> jsp 수정
+	이전, 다음 넣어주자
+=======================================================================================================================
+
+<< 계층형 게시판(답변형 게시판) >>
+day0212
+
+컬럼3개 추가
+b_ref		: 서로 관련글 임을 그룹화 하기 위한 컬럼
+	최초의 부모글 : 글번호와 동일하게 합니다
+	답글	      : 부모글에 b_ref와 동일하게 합니다
+
+
+b_level		: 답글의 계층을 위한 컬럼 그룹 (답글에 답글, 또 그 답글의 답글......등등) 최초의 글0 그 답글1 그답글2......
+	최초의 부모글 : 0
+	답글	      : 부모글의 b_level+1
+
+
+b_step		: 서로 관련글(같은level)일때 글이 나오는 순서를 위한 칼럼
+	최초의 부모글 : 0
+	답글	      : 이미 달려있는 답글들의 b_step을 1씩 증가시키고
+			부모글의 b_step+1로 설정
+
+
+1. 새글일때 처리
+	b_ref는 글번호(no)와 동일하게 한다.
+	b_level, b_step은 0으로 설정한다
+2. 답글일때 처리
+	b_ref는 부모글의 b_ref와 동일하게 한다.
+	이미 달려있는 답글들의 b_step을 1씩 증가한다.
+	b_level과 b_step은 부모글의 b_level,b_step에 1증가한 값을 설정한다.
+
+
+
+컬럼변경
+SQL> alter table board add b_ref number;
+SQL> alter table board add b_level number;
+SQL> alter table board add b_step number;
+
+BoardVo 컬럼에맞게 추가해주자~
+
+
+day0213
+<< MVC 패턴 >>
+M	: Model			-> 일처리를위한 자바 클래스들
+V	: view			-> 사용자 화면에 보여주기를 담당하는 jsp
+C	: Controller		-> 사용자의 요청을 받아들이고 요청을 파악하는 서블릿
+
+-----------------------------------------------------------------------------------------
+
+"삭제" 기능 추가해보기(요론느낌으로 다른것들도 할 수 있음.. insert, detail, update등등등)
+DeleteBoardAction(서블릿같은느낌)에서 
+삭제할 게시물번호를 받아서
+게시물번호를 상태유지시켜준다음에
+return "deleteBoard.jsp";을 실행해줌
+// 삭제하려면 비번을 사용자에게 받아야하니
+view page를 보여준다 //
+--->
+가지고간 게시글 번호를 상태유지시켜주면서
+비번을 입력하게한다음에 삭제를 누르면
+
+deleteBoardOk.do 이동
+--->
+DeleteBoardOkAction 에서 
+게시물번호와 비번을 매개변수로하는 deleteBoard(no, pwd)메소드를
+실행시켜서 일치하면 삭제
+일치하지않으면 실패메세지 뿌려줌
+걔는 deleteBoardOk.jsp에서 뿌려준다~~~
+하고 바로 listBoard.do이동시켜주는 foeward로 하던지 
+
+-----------------------------------------------------------------------------------------
+
+이전에는 서비스 하나당 하나의 controller(servlet)로 사용했음
+그 controller를 하나로 묶어서 해주고 싶어서
+
+<< Front Controller >>
+사용자의 모든 요청을 받아들여 처리하는 Controller
+
+사용자의 요청별로 Controller를 따로 따로 만들지 않고 
+하나를 만들어서 웹어플리케이션의 정문앞에 세워놓고 
+사용자의 요청모든 요청을 파악하여 해당 일처리를 담당자(Action)에게
+일을 맡기고(dao에게) 일처리결과에 따라서 view(.jsp)를 결정해주어요.
+
+!! 오늘할일 !!
+BitController를 작성하여
+모든 .do 패턴을(*.do) 받아들이도록 설정합니다
+
+서비스명 / 객체  --> 를 일일이 수정해야하니
+File에 넣어서
+
+
+=======================================================================================================================
+
+
+!! 연습하기 --> goodsTest!!
+BitController를 작성하여
+모든 .do 패턴을(*.do) 받아들이도록 설정합니다
+
+1. controller를 먼저 만든다(BitController)
+2. 모든 action들이 오버라이딩을 하게끔 인터페이스 Action을 만들고
+	String을 반환하는 proRequest(request, response)메소드를 만들고, 구체화한다.
+			  // 사용자가 요청하는걸 해결하는 메소드?
+private void proRequest(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException {
+	// TODO Auto-generated method stub
+   	
+   	String uri = request.getRequestURI();
+   	// .do 라는 서비스명을 가져오기위한 uri 근데 짤라와야함
+    	
+    	String cmd = uri.substring(uri.lastIndexOf("/"));
+    	
+    	BitAction action = map.get(cmd);
+    	String view = action.proRequest(request, response);
+    	
+    	RequestDispatcher dispatcher = request.getRequestDispatcher(view);
+    	dispatcher.forward(request, response);    	
+		
+	}        
+
+3. 원하는 Action을 만든다
+4. controller를 구체화 시킨다. 
+	doGet, doPost 에 peoRequest메소드를 호출한다.
+	그리고 사용자가 요청한걸 맵핑하러(.properties에 원하는 뷰페이지를 실행하는" .do = 액션클래스"를 저장한다)
+
+@Override
+public void init(ServletConfig config) throws ServletException {	
+	String path = config.getServletContext().getRealPath("WEB-INF");
+	// bit.properties의 경로
+	
+	try{
+		FileReader fr = new FileReader(path+"/bit.properties");	//bit.properties가 있는 경로의 파일을 읽어오게한다
+		Properties prop = new Properties();	// '=' 을 기준으로 key와 객체로 나누어주는 Class
+		prop.load(fr);				// fr을 읽어오는 메소드
+		Set set= prop.keySet();			// set으로 key들을 반환해주는데 Set은 반복문을 못함
+		Iterator iter = set.iterator();		// Iterator를 이용해서 set에있는걸 하나씩 꺼내와야함
+		while(iter.hasNext()) {
+			String key = (String)iter.next();	// key는 iter
+			String clsName = (String)prop.get(key);	// className 은 prop에서			
+			
+			Object obj = Class.forName(clsName).newInstance();
+			// className으로 객체만드는 메소드
+			map.put(key, (BitAction)obj);
+			// 각각 String과 객체를 map에 맵핑한다
+			// ex) "listGoods.do" , new ListGoodsAction
+		}
+		
+	}catch (Exception e) {
+		// TODO: handle exception
+		System.out.println(e.getMessage());
+	}
+}
+5. view page를 완성한다!
+
+=============================================================================================================
+
+<< detailGoods >>
+1. listGoods.jsp에서 앙크걸어서 detailGoods.do로 이동
+2. DetailGoodsAction을 만든다! ---> "return detailGoods.do";
+	1)상세보기할 상품번호를 받아온다
+	2)dao를 생성해서 이 상품번호를 매개변수로 하는 getGoods를 불러온다
+	3)불러온 getGoods를 Vo에 넣어서
+	4)request.setAttribute("g", g);
+3. detailGoods.jsp를 꾸며준다
+
+=============================================================================================================
+
+<< deleteGoods >>
+FrontControllerDetail.jpg
+
+=============================================================================================================
+
+
+day0214
+<< 템플릿페이지 >>
+.jsp를 구역별로 따로따로 만들어주어야함
+그걸 전체적으로 해주는 문서는 main.jsp
+
+
+<< Filter >>
+웹어플리케이션에서의 필터는 특정 요청을 수행하기 전에
+처리되는 기술을 말합니다. 
+예를 들어 어떤 서비스들은 반드시 로그인 해야만 서비스 되는 것들 이라면
+로그인한 상태인지 아닌지를 Filter를 통해 처리할 수 있어요.
+
+그러면 이 필터를 통해 사용자의 상태를 파악하여 그 상태에 따라 
+요청한 서비스로 이동되게 할 수도있고
+그렇지 않으면 요청한 서비스를 하지 못하고 다른곳으로 이동하게 할 수도 있어요.
+
+===> 관리자로 로그인해야지만 
+	상품추가, 상품수정, 상품삭제가 가능하도록
+	필터를 이용하여 제한해보기!
+
+
+day0217
+<< 웹어플리케이션의 Listener >>
+웹어플리케이션에서의 이벤트 처리와 같은 것입니다.
+예를들어 
+	서버가 가동될때 어떤 일을 시키고 싶어요.
+	서버가 종료될때 어떤 일을 시키고 싶어요.
+
+	세션이 연결될때 어떤 일을 시키고 싶어요.
+	세션이 종료될때 어떤 일을 시키고 싶어요.
+		---> 자동으로
+
+	새로운 요청이 일어날때 어떤 일을 시키고 싶어요.
+	session에 값을 담을때 마다 어떤일을 시키고 싶어요.
+	request에 값을 담을때 마다 어떤일을 시키고 싶어요.
+	
+	.....
+
+
+1. lifecycle 서버가 시작할때 종료될때
+2. change~~ 어플리케이션의 값을 설정하거나 할때 발생하는 이벤트
+
+세션~
+1. 새로운 세션이 연결, 종료될때  하나의 브라우저가 연결될때
+2. 값을 설정할때
+
+request~
+1. 새로운 요청을 할때마다
+2. 
+
+implements 
+
+
+연습) boardTest에 리스너를 적용하여 새로운 요청이 
+	있을때마다 요청한 uri와 요청시간을 화면에 출력해봅니다.
+
+
+
+
+
+
+
+
+
+
+
+
+

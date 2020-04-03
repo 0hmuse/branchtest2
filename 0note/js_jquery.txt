@@ -1,0 +1,447 @@
+<< 자바스크립트~ >>
+jquery, Ajax 을 이해하기에 앞서 자바스크립트에 대하여 알아보자!
+
+javaScript	: 웹 프로그래밍 언어(클라이언트 사이드): 웹에서 소스가 노출됨
+
+jsp		: 웹 프로그래밍 언어(서버 사이드): 웹에서 소스가 노출되지 않음
+
+* 웹 어플리케이션 초기에서 소스코드가 전부 노출이되는 자바스크립트는 인기가 없었어요.
+	서버로 보내기 전에 사용자의 입력값을 검사하는(유효성검사)하는 용도로만 사용하는 추세였다.
+	그러나, 현재의 웹은 사용자의 요구가 복잡해지고
+		또, jsp를 요청하게 되면 문서 전체를 읽어 오게 되는데 
+		필요한 부분(데이터)만 서버로부터 읽어오는 기술(Ajax)이
+		필수로 웹어플리케이션이 사용되어서 이 Ajax은 자바스크립트 기술이므로
+
+		현재는 "자바스크립트"가 중요하게 사용되어 있습니다.
+
+		또, 크롬브라우저가 발표되면서(2008년정도) 원래 자바스크립트는 클라이언트(브라우저)에서
+		동작하는 것이었는데
+		이 자바스크립트를 브라우저가 아닌곳에서 동작하는 기술을 발표한다
+		--> 그것이 node.js입니다.
+
+		이 node.js를 사용하게 되면 더이상 클라이언트사이드라고 볼 수 없다.
+
+		node.js기반의 패키지중 웹서버를 위한 패키지 express라는 모듈이 있습니다.
+
+		이것을 이용하면 톰캣같은 서버설정 없이 단 몇줄이면 서버를 가동할 수 있어요.
+
+		==> 즉, 자바스크립트만으로 웹 서비스가 가능합니다.
+
+		풀스택(MEAN스택)개발자
+		- MonngoDB	: 
+		- express	: 서버를위한
+		- angular	: 뷰를위한
+		- Node.js	:
+			jquery나 angular는 Ajax통신을 통해서 서버로 부터 받아온 데이터를 갖고
+			동적 html노드를 쉽게 생성, 수정, 삭제하기 위한 기술입니다.
+	< 뷰템플릿 >
+	jquery
+	angular
+	React
+	Vue.js
+
+
+책 part1 javascript---------------------------------
+https://jquery.com/
+
+exam02/ex08.jsp : 요즘방식
+
+연습) 사용자한테 두 수를 입력받아 그 중에 큰수를 찾아 출력하는 스크립트를 작성하고
+	결과를 확인해 보자 ex05
+
+*** jquery(ex06)
+==> html노드(DOM)를 쉽게 선택, 수정, 삭제 하도록 하는
+	javaScript확장기술
+	(자바스크립트를 기반으로 만들어진 라이브러리)
+==> Ajax을 쉽게
+==> 쉽게 시각적으로 미려하게
+
+jquery
+// window.onload같은거
+$(function(){
+	코딩해라~
+});
+
+$("#btn") -> btn이라는 이름을 잡아와
+
+$("#btn").click(); -> click안에 매개변수 function을 준다
+
+$("#btn").click(function(){ -> btn을 누르면 function안에있는 내용을 수행해라~
+	코딩해라
+});
+
+jquery의 반복문
+$.each(배열이름, 해야할function(배열의 인덱스, 배열의 데이타){
+		해야할일~~~
+	});
+
+exam03 :자바스크립트 함수만들기
+
+211page
+window 객체의 타이머 메서드
+표 8-3
+
+page225
+createElement(tagName) : 미래에 노드를 생성한다
+createTextNode(text) : 텍스트 노드를 생성한다.
+
+
+day0309
+page225~
+
+자바스크립트에서 객체만들기~~
+exam01 -> ex04.jsp (텍스트불러오기)
+-------------------------------------------------------------------------------
+자바스크립트 :
+	현재의 자바스크립트는 처음에는 없는 태그(요소,노드,객체)를
+	사용자의 요구에의해 생성할 수도 있고
+	또 수정할 수도 있고, 삭제할수도 있다.
+
+현재의 웹은 사용자 요청에따라 페이지전체가 갱신되기보다는 
+	문서의 일부분이 갱신되는 경우가 많아요.
+	==> 이를위해서 자바스크립트를 이용하여 변경되는 부분의 태그를
+	동적으로 생성, 수정, 삭제할수 있어요
+	==> 이것을 또 쉽게해주는 기술이 jquert, react, Vue.js입니다
+또, 문서 전체를 갱신하는 것이 아니라 일부분을 갱신한다고 했는데
+	이때 필요한 데이터는 서버로부터 받아와야 한다.
+	자바스크립트에서 서버를 요구하는 기술이 "Ajax"입니다.
+그러면 앞으로 우리가 공부할 서버는 view전체를 즉 jsp로 응답하기보다는
+	필요한 데이터만 응답하는것으로 수정되어야 합니다.
+일반적으로 응답하는방식이 Ajax통신을 통해서 필요한 데이터만 응답해야하는데
+	그 응답방식이 csv, json, xml방식이 널리 이용됩니다.
+-------------------------------------------------------------------------------
+
+exam01 -> ex05.jsp , ex06.jsp (이미지불러오기)
+
+exam02 -> ex01.jsp (innerHTML)
+exam02 -> ex02.jsp (getElementsByTagName(tagNmae); 배열을 반환한다.)
+
+exam02 -> ex04.jsp (스타일적용)
+
+-----------------------------------------------------------------------------------------
+exam03 -> ex04, ex05.jsp 참고해서	****ex06.jsp -> 다시한번 해보기(등록,수정,삭제)
+
+	"입력한 값으로 한 행을 만들어서 table에 넣는다
+		tr을 만들자"
+	* input들에 입력한 애들을 다 가져온다 = 배열이됨
+	* 그 배열을 td배열 arr에 담을거임
+	* 선택한 배열 selTr		====> 3가지 변수처리먼저 해줌
+
+	(( 입력하기 ))
+	1. 등록버튼을 눌렀을때 이벤트처리한다
+	2. input태그들의 요소만큼 text노드를 생성한다.
+	3. 등록한 값(input)만큼 루프를돌아서 text노드를 생성한다.
+	4. td를 생성한다음에 text노드를 담는다	-> tr.appendChild(textNode);
+	5. tr을 생성한다음 td를 담는다	-> tr.appendChild(td);
+	6. 사용자가 입력하는것은 4개이고 총점과 평균은 따로 구해서 넣어주자
+	7. 총점을 누적하기위한 변수를 선언함	-> var tot = 0;
+	8. 총점을 누적할때 i가 0일때는 이름이므로 제외하고 나머지를 누적해주자
+		(계산할 수 있는 숫자로 변환(eval)하여 누적한다)
+		if(i != 0){
+			tot += eval(input[i].value);
+		}
+
+	9. 반복문을 나온 후 그 총점을 3으로 나누면 평균	-> var avg = tot/3;
+	10. 총점과 평균을위한 텍스트노드를 생성한다.
+		var txtTot;
+		var txtAvg;
+	11. td들을 생성한다 -> var tdTot, var tdAvg
+	12. td에 text노드를 넣는다. -> tdTot.appendChild(txtTot), tdAvg.appendChild(txtAvg)
+	13. tr에 td를 담는다. -> tr.appendChild(tdTot), tr.appendChild(tdAvg)
+	14. tb를 생성하고 tr을 넣는다 -> tb.appendChild(tr);
+
+	**text노드 -> td -> tr -> tb 순으로 담아주자~	 부모태그.appendChild(담을태그)
+
+
+	(( 수정하기 ))
+	1. 무엇을 수정할껀지 눌러진 행의정보를 input에 뿌려줌
+		// 미래에 생성될 tr에 클릭이벤트를 설정하여, 선택한 행의정보를 
+			각각의 입력창에 출력한다
+		tr.onclick = function(){
+			
+		}
+	2. 선택한 tr을 selTr에 설정한다	-> 수정, 삭제시 필요
+		tr.onclick = function(){
+			selTr = this;	
+		}
+	3. 선택한 tr의 자식노드를 읽어온다 -> 그것은 곧 td들
+		tr.onclick = function(){
+			selTr = this;
+			arr = this.childNodes;
+		}
+	4. 선택한 행의 td중에 이름,국어,영어,수학만 입력창에 출력한다
+		for(var i in input.length){
+			input[i].value = arr[i].innerHTML;
+		}
+	5. 어떤 행을 수정할껀지 하이라이트를 설정한다
+		this.style.background = "yellow";
+	6. 모든 tr의 배경을 흰색으로 설정한다
+		var trList = document.getElementsByTagName("tr");
+		trList만큼 루프를 돌아 흰색으로 설정하준다
+
+	7. 행을 눌러서 입력창에 수정하고 수정버튼을 눌렀을때
+		수정된 정보들로 다시 넣어주어야 함(이미있는 태그에다가 다시 등록함)
+	8. 입력창의 개수만큼만 루프를돌아서 arr에 담아놓은 td를 바꾸는것임
+						(arr = td)
+	   = input태그의 수 만큼 반복실행한다. arr[i].innerHTML = input[i].value;
+	9. 바뀐정보로 총점과 평균을 구해서 td[4],td[5]각각 tot, avg넣어준다
+								평균은 반복문빠져나온다음에
+	arr[4].innerHTML = tot;
+	arr[5].innerHTML = avg;
+	
+
+	(( 삭제하기 ))
+	1. 삭제버튼이 눌러졌을때의 이벤트처리해주기
+	2. 삭제하는 tb.removeChild(setTr) 함수를이용하자
+		==> 테이블(tb)로 부터 선택항 행 (selTr)을 삭제한다.
+-----------------------------------------------------------------------------------------
+
+
+
+exam04 -> ex02.jsp (객체여러개를 생성해서 배열에 넣는다)
+	var arr = [ 
+		{name:"축구공",fname:"ball1.jpg"},
+		{name:"유니폼",fname:"cloth1.jpg"},
+		{name:"축구화",fname:"shoe1.jpg"},
+		{name:"스타킹",fname:"stock1.jpg"} ];
+	======> JSON (javaScript Object Notation)
+
+
+
+day0310
+exam01 -> ex01,ex02,ex03 정리해야함 ==> ok!
+exam01 -> ex05.jsp(객체의 속성만큼 반복문을 돌릴수있다), ex06.jsp
+
+<< 자바스크립트의 for in >> exam01 -> ex07.jsp, ex08.jsp----------------------------
+	==> 데이터를 갖고오는 것이 아니라, 인덱스를 갖고 와요!!
+
+var arr = ["홍길동","이순신","유관순"];
+for(var i in arr){
+}====> 이때 i는 자바의 for(String:list){}처럼 데이터를 갖고오는 것이 아니라
+	인덱스를 갖고 와요
+	i의 내용을 0,1,2만큼 반복수행해요!
+
+String arr[] = {"홍길동","이순신","유관순"};
+for(String i : arr){
+}====> 자바에서 i는 데이터가 온다.
+	"홍길동","이순신","유관순"차례대로 i에 대입된다.
+
+
+
+**for in을 객체에 사용할 수 도 있어요.
+즉, 객체의 속성의 수 만큼 반복실행할때 사용해요.
+
+var person = {name:"홍길동",age:20,addr:"신수동",tel:"010-1234-5678"};
+만약 person객체의 속성의 수만큼 반복실행해야 될 필요가 있다면 for in을 사용한다
+for(var i in person){
+	alert(person.i);	---> X: person객체에서 "i"라는 속성명을 찾는다
+	alert(person[i]);	---> O: 속성명이 담긴 i를 변수처리하기 위해서는
+					배열첨자 연산자를 이용해서 접근하자 -> []사용
+
+}=====>이때 i는 person객체가 갖고있는 속성명이 차례대로 대입된다
+	(name,age,addr,tel)
+------------------------------------------------------------------------------------
+
+<< 자바스크립트에서 타이머 설정하기 >>
+1. 지정한 시간이 되면 딱 한번 동작시키기
+	===> setTimer(함수, 시간)
+
+2. 지정한 시간마다 반복하여 동작시키기
+	===> setInterval(함수, 시간)
+
+
+function pro(){
+	a;
+	b;
+}
+
+setTimer(pro, 2000)
+	===> 2초뒤에 pro함수를 한번만 실행하세요
+setInterval(pro, 2000)
+	===> 2초마다 pro함수를 반복하여 실행하세요
+
+
+pro함수 없이
+setTimer(function(){ 
+	a; 
+	b;	
+},2000);
+
+setInterval(function(){ 
+	a; 
+	b;	
+},2000);
+
+타이머를 설정할때 미리 함수를 만들어 둘수도 있고
+이름없는 함수를 매개변수로 바로 설정할 수도 있어요.
+
+<< 타이머 끄기 >>
+
+clearTimer(변수명)
+clearInterval(변수명)
+
+var a = setTimer(function(){}, 5000);
+clearTimer(a);
+
+var b = setInterval(function(){}, 1000);
+clearInterval(b);
+
+exam02 -> ex04.jsp (시간 str로 만들어보기)
+
+
+day0311
+exam01 -> ex08.jsp (속성으로 idx를 만드는것에 대해서, ex08-1 ex08-2 ex09)
+인덱스(i)를 걸어서 이벤트를 부여할때 그 i는 그 이벤트를 받는 애들의 순서만 나타내주니까
+그 안에서 또 인덱스(i)를 쓸수없다..
+
+===> 그 노드에 속성(idx)를 부여해 주어야 한다...
+
+exam02 -> ex03 ex04 그림이동
+exam03 -> joinFrom
+다음에 조건에 만족하지않으면 서버이동을 하지않도록 기본이벤트를 제거하도록하자
+(유효성검사)
+-아이디 6자이상
+-이름은 2글자이상
+-암호는 8자이상
+-암호와 암호확인이 일치
+-나이는 숫자형태
+아이디: <input type="text" name="id" id="id"><br>
+	======> name 은 서버이동시에 필요한 이름표
+		id 는 script이동시에 필요한 이름표
+// is Not a Number -> 너 숫자아니야?
+
+exam03 -> ex04.jsp
+	  ex05.jsp (부모와 자식모두 이벤트가 있을때
+			원래는 자식을 누르면 둘다 이벤트가 걸린다.
+			근데, 자식을 눌렀을때 부모에 이벤트가 걸리지 않게 하기위해서~)
+			===> var event = window.event;
+			     event.stopPropagation();
+
+**// .innerHTML = 정보를 입력할때(다시 넣을때)
+**// .value = 입력한정보를 가져올때
+===============================================================================
+공공데이터 사이트에서 
+	'관심있는', '의미있는' 데이터를 찾아보기
+
+	리스트 누르면 지도를 보이게~ 
+
+
+%% 공공데이터 활용 %%
+개인프로젝트를 위한 데이터를 찾아 보고 활용신청 합니다...
+또, 선택한 데이터에 따른 메뉴얼을 미리 다운받아 놓습니다
+
+자신이 관심있는, 사람들에게 유익한 정보를 제공하는...
+
+xml, json 데이터를 찾으시오~
+
+%% 스프링에서 json으로 응답하는 서비스를 작성하고
+	이것을 Ajax통신으로 요청하는 스크립트를 작성해 봅시다. %%
+
+
+day0312
+jQuery: 자바스크립트 라이브러리(자바스크립트 기반언어)
+	--> 동적으로 노드조작을 쉽게해준다
+		(대상이 되는 노드를 빠르게 선택할 수 있어요.
+		노드생성을 쉽게할 수 있다)
+		ex) document.getElementById("btn"); => $("#btn");
+
+		    var li = document.createElement("li");
+		    var txtNode = document.createTextNode("사과");
+		    li.appendChild(txtNode);
+		    ===>
+			    $("<li></li>").html("사과");
+			    or $("<li></li>").text("사과");
+	    Ajax통신을 쉽게 ===> DOM과 관련된 처리를 쉽게 구현
+	    다양한 플러그인(이미 만들어진)을 활용하여 시각적으로 미려하게 꾸밀 수 있다.
+
+exam01 -> ex01.jsp(js) ex02.jsp(jqurey) 비교
+
+exam01 -> ex03 ~ ex
+javaScript							jquery
+---------------------------------------------------------------------------------------------------------------
+<< (작업할)대상이 되는 노드 찾기 >>
+var trArr = document.getEelementsByTagName("tr");		var trArr = $("tr");		**태그이름을 선택(배열)
+var btn = document.getElemenetById("btn");			var btn = $("#btn");		**id이른으로 선택(하나)
+var memberArr = document.getElementsByClassName("member");	var memberArr = ($".member");	**클래스이름으로~(배열)
+
+<< 스타일 지정하기 >>
+document.getElementById("name").style.color = "blue";		$("#name").css("color","blue");
+
+<< 스타일을 한번에 여러개 지정하고 싶어요 >>
+document.getElementById("name").style.color = "blue";		$("#name").css("color","blue");		
+document.getElementById("name").style.background = "red";	$("#name").css("background","red");
+									===> 객체형태로 한꺼번에 지정할 수 있다
+								$("#name").css({color:"blue"},{background:"red"});
+input 태그 읽어오기 --> value()					val()
+text 태그 읽어오기 --> innerHTML()				html(),text()
+input 태그 세팅하기 --> value(" ")				val(" ")
+text 태그 세팅하기 --> innerHTML(" ")				html(" "),text(" ")
+
+exam01 -> ex11.jsp
+===> 마우스가 올라가고 내려가는건 많이 사용하기때문에
+hover라는 함수를 이용한다(이때, style에 먼저 클래스(적용할 css) 만들어준다)
+$("클래스그룹").hover(function(){올라갈때},function(){내려갈때});
+
+올라갈때 --> $(this).addClass("스타일에 클래스이름");
+내려갈때 --> $(this).removeClass("스타일에 클래스이름")
+
+
+<< 자식노드와 후손노드 선택 >> exam02 -> ex07.jsp ex08.jsp
+$("#a > h1")	: a의 자식둥에 h1노드들 선택
+
+$("#a h1")	: a의 후손중에 h1노드들 선택
+
+
+exam02 -> ex09, ex10 , ex10-1
+버튼에 속성을 의미있는걸로 해서
+변수처리하고 그걸 아이디로 쓸수 있다
+
+버튼의 텍스트 자체가 어떤 일처리를 위한 텍스트가 될 수도 있다
+
+
+
+특정 태그를 선택하는 함수 ===> 선택자.find()  (선택자 후손들 중에 특정 태그를 찾는다)
+jQuery.pdf 41page
+
+
+*** exam03 -> ex01~ex03.jsp
+	여러개의 <input> 에서 type별로 묶을수 있다
+		input[type=text]: text로 묶겠다~~~ input의 내용을 넣고빼는건 .val()	/ 자바스크립트에선 .value
+	.var() 과 .var("입력내용") 의 차의 .html() 과 .html("입력내용") 또 .text()과 .text("입력내용")
+	jQuery의 반복문				/ 자바스크립트에선 .innerHTML()
+
+
+day0313
+			     (json)
+html의 태그는 모양을나타내고 xml의 태그는 name:하지연
+						==> <name>하지연</name>(성격)을 나타낸다
+
+exam01 -> ex02.jsp (xml 데이터 만들고 해석하고 이용하기)
+
+
+$(a).html();	<-- a는 입력양식 외
+$(a).text();
+
+$(a).val();	<-- a가 입력양식일때 사용.
+
+	$(a).val("안녕");	<-- 값을 설정한다
+	$(a).val();		<-- 값을 읽어온다
+-------------------------------------------------------------------------------
+
+<< 이벤트 연결 >>
+$("tr").bind("click",function(){});	--> 옛날
+$("tr").click(function(){});		--> 요즘
+	==> 처음부터 있는 tr에만 이벤트가 적용된다
+
+미래에 만들어진 tr에도 이벤트를 적용하고 싶어요.
+	==> $("tr").live("click",function(){});	--> 옛날버전이며 현재는 on함수를 사용한다
+		==> 처음에있는 tr,미래에 만들어질 tr 모두에 이벤트를 적용한다
+
+<< 현재버전에서 미래에 생성될 노드에도 이벤트 추가 >>
+$(document).on("이벤트이름","선택자",function(){});
+
+<< 숙제...
+1. 공공데이터를 활용하여 자신이 구상한 어플리케이션을 구현 해 봅니다.
+	핵심기능(데이터처리)에 치중하여 구현해 봅니다.
+2. 그림판의 그림을 이미지로 거쳐서 저장하지않고
+	바로저장하는 방법을 찾아보세요.

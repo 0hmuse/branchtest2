@@ -1,0 +1,22 @@
+<< spring boot에서 filter사용 >>
+이클립스처럼 위저드가 제공되지 않아요!
+
+Filter인터페이스(javax.Servlet)를 구현한 Filter클래스를 직접 만들어용
+doFilter메소드를 오버라이딩 해서
+	그안에 필터가 해야할 내용을 기술한다
+	사용자의 상황에 따라서 요청제어를 할 수 있다(원하는 곳으로 보낼수도 있다)
+	
+	실제 요청한 곳으로 가기전에 filter에와서 또 다시 다른곳으로 보낼수 있음
+
+	실제 요청한 곳으로 보내려면
+	chain.doFilter(request, response)메소드를 호출하고
+
+	이 서비스를 받을 상황이 아니라면
+	response.sendRedirect()로 다른곳으로 보냅니다.
+
+Filter 클래스 헤드에 다음과 같이 설정합니다
+@WebFilter("/hello")	: hello요청이 있을때만 필터동작함
+@WebFilter("/board/**")	: board에 있는 모든요청일때 필터동작함
+
+그리고 메인메소드(혹은 Configration)가 있는 클래스 헤드에
+@ServletComponentScan	//'filter사용할꺼임' 이라는 어노테이션

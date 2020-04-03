@@ -1,0 +1,100 @@
+<< File처리하기 >>=======================================================================
+
+File file = new File("경로.파일이름.확장자까지");
+file.delete();
+JOptionPane.showMessageDialog(null, "삭제되었습니다");
+	--> 할일을 다 한다음에 창을 하나 띄워줌
+	JOptionPane.showMessageDialos(null, 창에넣을 문구);
+
+if(file.isDirextory())		boolean을 반환해줌
+    file.isFile				두가지로 물어볼수 있음 파일이냐 디렉토리냐
+->디렉토리입니다
+else
+->파일입니다
+
+
+String []arr = file.list();
+지정한 경로의 파일의 목록을 불러주는것
+배열로 반환한다.
+저 arr을 읽어주려면
+for(String list:arr){
+	System.out.println(list);
+}
+
+
+FileReader fr = new FileReader(경로);
+
+
+
+
+<< JFrame >>=============================================================================
+
+JFrame frame = new JFrame(); <- 상속받으면 객체생성 안해줘도됨
+
+항상 오는 친구들
+setSize(가로, 세로);
+setVisible(true); -> 프레임을 나타내줘
+setDCO(JFrame.EXIT_ON_CLOSE); -> 엑스창 활성화시켜줌
+setDefaultCloseOperation
+
+
+
+setLayout(new FlowLayout());	-> 요소들을 순서데로 위에서아래로 왼쪽에서 오른쪽으로
+setLayout(new BorderLayout());	-> 요소들을 좌우 위아래 센터로 위치시킬 수 있다
+
+JPanel을 jp라고 했을때
+jp.setLayout(new BorderLayout());
+판넬을 보더레이아웃으로 셋팅하겠다! 라는 뜻임...
+
+프래임에 버튼, 라벨, 판넬 등등을 붙일수 있다
+add(붙이고싶은것!);
+
+판넬에 붙이겠다
+JPanel panel = new JPanel();
+panel.add(판넬에 붙이고싶은것);
+add(panel); --> 그 판넬을 프레임에 붙인다.
+
+최종 프레임에 판넬들을 붙인다. 위치를 setLayout해서...
+
+
+JTextArea();
+
+JTextArea jta = new JTextArea();	얘는 대부분 JScrollPane에 감싼다
+JScrollPane jsp = new JscrollPane(jta);
+				   -> text들이 지정된 부분을 초과할때 스크롤생성하게 해줌
+
+
+
+
+
+
+
+
+<< JList >>==============================================================================
+list = new JList<String>();
+
+JList()
+JList(E[] listData)
+...
+
+	생성자중에 배열 list를 받는애도 있음
+	list = new JList<String>(배열);
+
+Vector<String>		---> string형을 다 담을 수 있는건가...?
+
+Vector<String> data = new Vector<String>();
+list = new JList<String>(data);
+
+
+
+<< URL 읽어오기 >>=======================================================================
+URL url = new URL("읽어오고 싶은 인터넷 페이지");
+
+InputStream is = url.openStream();
+byte []data = new byte[100];		100byte만큼 배열로 읽어오겠다
+
+// byte를 String으로 바꿔주어야함
+Shring str = "";
+while(is.read(data) != -1){
+	
+}

@@ -1,0 +1,77 @@
+column bookid format 9999;
+column bookname format a20;
+column publisher format a10;
+column price format 999,999;
+column saleprice format 999,999;
+
+column custid format 9999;
+column name format a15;
+column address format a30;
+column phone format a20;
+
+column dno format 9999;
+column dname format a10;
+column dloc format a10;
+
+column eno format 9999;
+column ename format a10;
+column jab format a10;
+column sal format 9,999,999;
+column comm format 9,999;
+column mag format 9999;
+column hiredate format a15;
+column email format a20;
+column jumin format a15;
+column id format a10;
+
+column no format 9999;
+column title format a10;
+column writer format a10;
+column pwd format a10;
+column content format a15;
+column regdate format a15;
+column hit format 9999;
+
+column 상품번호 format 9999;
+column 상품명 format a20;
+column 단가 format 9,999,999;
+column 재고수량 format 9999;
+
+column 거주여부 format a30;
+column 입고번호 format 9999;
+column 상품번호 format 9999;
+column 입고수량 format 9999;
+column 입고일 format a15;
+
+column 등급 format a15;
+column total format 9,999,999;
+
+column center_no format 9999;
+column center_name format a15;
+column center_tel format a15;
+column center_addr format a15;
+
+column id format a15;
+column name format a15;
+column tel format a15;
+
+column rent_no format 99;
+column car_no format 9999;
+column rent_loc format a15;
+column return_loc format a15;
+column rent_date format a15;
+column return_date format a15;
+column total_fee format 9,999,999;
+
+column car_type format a10;
+column color format a10;
+column seats format 99;
+column fname format a15;
+column type_no format 99;
+
+column type_name format a10;
+column rent_rate format 9999.99;
+
+column option_no format 9999;
+column option_name format a20;
+column option_fee format 9999;

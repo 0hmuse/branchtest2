@@ -1,0 +1,4000 @@
+<< DATA BASE >>==========================================================================
+데이터베이스의 필요성
+	==> 프로그램 실행결과를 영구적으로 지정하기 위해서는
+	    "파일"을 이용합니다.
+
+	그러나 "파일"은 이해관계에 있는 다수사용자가 동시에 최신의 정보를 공유하기에 
+	어려움이 있습니다.
+	이것을 위하여 "데이터베이스"를 이용합니다.
+
+"데이터베이스"는 자료를 쌍아놓은 더미라고 생각합니다.
+이러한 데이터를 쌓아놓은 더미를 관리하는 시스템이 필요해요.(프로그램)
+
+==> 데이터베이스 관리 시스템(DataBase Managment System : DBMS)
+	(JAVA와연결하기)
+DBMS의 종류
+-> mssql
+-> mysql
+-> oracle
+
+	c:\>sqlplus
+	암호입력:manager
+
+	sql>create user c##bit identified by bit;	
+			->사용자이름	     ->암호
+	c:\sqlplus
+	userName:c## bit
+	password:bit
+
+=========================================================================================
+
+	sqlplus
+	system
+	manager
+
+	SQL> conn c##bit/bit;	
+
+	sql>create table student(		<- 테이블만들기
+			name varchar2(20) primary key,
+			kor number,		->중복안되게 제약을 건다(pk)
+			eng number,
+			math number);
+	
+삽입	insert into student values('홍길동',80,90류,100);		<- 데이터넣기
+
+	commit; ((save같은거
+
+	select * from student; (모든표 보여줘)
+테이블	drop table student;
+삭제
+
+
+수정	update student set kor=50,eng=50,math=50 where name='지연';
+삭제	delete student where name='유관순';
+화면	cl scr
+정리
+
+<< 테이블의 컬럼이름을 변경하고 싶어용 >>
+alter table 테이블명 rename 원래컬럼명 to 바꿀컬럼명;
+
+-----------------------------------------------------------------------------------------
+데이터 조작어들
+
+
+데이터베이스 설계자
+
+
+<< 데이터 베이스 명령어(SQL)의 종류 >>===================================================
+	1. DDL(Data Defination Language)	데이터 정의어(create,alter,drop)
+	2. DCL(Data Control Language)		데이터 제어어(grant, revoke)
+	3. DML(Data Manufulation Language)	데이터 조작어**(select*, insert, delete, update)
+								=> (질의어)query
+	
+
+
+
+bookid, bookname, publisher, price	/ 열, column, 속성
+1, 축구의역사, 굿스포츠, 7000		/ 레코드, 행, row
+	...
+
+속성과 레코드, 행과 열 로 구성되어있다.
+
+
+출판사, 가격(속성) 등등이 '중복'될수있다...
+레코드는 중복되면 xxx
+
+주식별자 - 다른레코드와 구별하기위해
+primer key
+
+
+------------------ 서점관리를 위한 데이터베이스 테이블들을 생성 -------------------------
+(day0108)
+
+도서
+고객
+주문
+
+도서(도서번호*, 도서명, 출판사, 가격)
+Book(bookid*, bookname, publisher, price)
+
+1. 서점관리 데이터베이스의 권한이 있는 사용자 계정을 생성한다.
+2. 데이터베이스 관리자(system, sys)계정에 접속하여 사용자 계정을 생성한다.
+3.		c:>sqlplus
+0		사용자명 임력: system
+		비밀번호 입력: manager
+사용자생성	SQL>create user c##madang identified by madang;	
+권한부여	SQL>grant connect, resource, dba to c##madang;
+사용자변경	SQL>conn 사용자명/암호;
+		
+	
+=>table생성하기
+create table 테이블명(속성명1 자료형 [제약], 속성명2 자료형 [제약], 속성명3 자료형 , .... );
+				       -> 있을수도 없을수도 있어요~
+
+			  -> 숫자는 모두 number	
+create table book(bookid number primary key,bookname varchar2(50),publisher varchar2(20),price number);
+				 -> 식별자(pk)*	       -> 문자(가변문자크기)
+
+
+(문자크기) -> 박(3)지(3)성(3)->(9개이상 설정해주자!)
+=>생성된 테이블의 구조 확인
+SQL>desc book;
+
+=>테이블에 자료를 추가하기
+SQL>insert into 테이블명 values(값1, 값2, ... );
+	값의 개수는 테이블구조의 속성수와 같아야함.
+	또, 값의 순서도 테이블구조의 순서와 같아야함.
+	또또, 문자열은 반드시 ''로 묶어준다.
+
+SQL>insert into book values(1,'축구의역사','굿스포츠',7000);
+
+=>여러개를 입력할때
+SQL>ed book			--> 메모창이 뜸 거기다 입력해줘
+SQL>@book			--> 그 파일안에있는 sql를 한번에 실행해준다
+SQL>commit			--> 새로고침
+
+=>자료확인하기(검색)
+SQL>select 컬럼1,컬럼2, ... from 테이블명;
+
+
+=> 포맷출력 변경하기
+SQL>column bookid format 9999;
+SQL>column bookname format a10;
+SQL>column publisher format a10;
+SQL>column price format 999,999;
+
+column bookid format 9999
+column bookname format a20
+column publisher format a10
+column price format 999,999;
+
+column custid format 9999
+column name format a20
+column address format a30
+column phone format a20;
+
+=> table 모두보기
+SQL>select*from book;
+
+
+=> orders(주문) table 만들기
+orders table은(관계형(RDD) 데이터베이스)
+==> 부모자식관계(주종관계)
+    -> (데이터가먼저 생긴table이 부모)
+
+주문을 위해서 필요한 테이블을 다음과 같이 생성해요
+orders(orderid*, custid, bookid, saleprice, orderdate)
+
+누가		custid
+어떤책을	bookid
+언제		orderdate
+얼마에		saleprice
+구매하였는지 저장해요
+
+이때 order테이블에 나타나는(추가되는) custid는
+반드시 customer테이블에 존재하는 custid이여야 한다.
+=> "관계"를 설정한다(주종관계/부모,자식관계)
+마찬가지로 
+orders테이블에 나타나는 boodid는
+반드시 book테이블에 존재하는 bookid로 관계를 성정한다.
+
+create table orders(orderid number primary key,	     --> 부모개체(table)의 주식별자(custid)만이 관계를 설정할 수 있다
+		custid number references customer(custid), 
+		bookid number references book(bookid), 
+		saleprice number ,		--> 부모개체(book)의 주식별자(bookid)만이 관계를 설정할 수 있다
+		orderdate date);
+
+
+insert into orders values(1, 1, 1, 6000, '2014/07/01');
+insert into orders values(2, 1, 3, 2100, '2014/07/01');
+insert into orders values(3, 2, 5, 8000, '2014/07/03');
+insert into orders values(4, 3, 6, 6000, '2014/07/03');
+insert into orders values(5, 4, 7, 20000, '2014/07/04');
+insert into orders values(6, 1, 2, 12000, '2014/07/05');
+insert into orders values(7, 4, 8, 13000, '2014/07/07');
+insert into orders values(8, 3, 10, 12000, '2014/07/08');
+insert into orders values(9, 2, 10, 7000, '2014/07/09');
+insert into orders values(10, 3, 8, 13000, '2014/07/10');
+오늘날짜 sysdate
+
+연습) 존재하지않는 고객번호로 orders테이블에 insert를 수행하고
+어떤오류가 발생하는지 기록하세요.
+
+SQL> insert into orders values(11, 7, 5, 8000, '2020/01/09');
+insert into orders values(11, 7, 5, 8000, '2020/01/09')
+// customer에 없는 고객번호를 입력함(7)
+*
+1행에 오류:
+ORA-02291: 무결성 제약조건(C##MADANG.SYS_C007309)이 위배되었습니다- 부모 키가
+없습니다
+
+CustomerVo 
+CustomerDAO datavase acc object
+
+
+PreparedStatement prepareStatement(String sql)
+                                   throws SQLException
+Creates a PreparedStatement object for sending parameterized SQL statements to the database.
+
+
+Statement를 통해 사용하는 메소드
+	1. executeUpdate
+		데이터베이스에 변동이 있는 명령을 실행할 때 사용
+		데이터베이스에 새로운 레코드추가	- insert
+		데이터베이스에 레코드를 수정		- update
+		데이터베이스에 레코드를 삭제		- delete
+		
+		==> exexuteUpdate가 sql명령을 실행하고
+			int를 반환
+			성공적으로 sql명령을 실행한 레코드의 수를 반환	
+
+	2. executeQuery
+		데이터베이스의 레코드를 검색할때	- select
+
+정렬하고싶을때
+==> 검색할때 정렬기준을 정해주면 된다
+selest*from customer
+orders by custid;
+
+==============> 새로운 도서를 등록하기 위한 자바 어플리케이션을 작성하세요.
+		어떻게 진행할 것인지 먼저 계획해보기
+
+		1. 도서입력을 위한 JFrame만들기(main)
+		2. 그 입력한 요소들을 묶어줄 자료형 만들기(table book이랑 같은요소로)
+			데이터를 주고받기위해 getter setter만들주어야함
+		3. 데이터베이스와 통로가 되어줄 메소드 만들어주기
+		4. main 에서는 입력한정보를 한데 묶어준다음에 
+			통로에 던져준다....
+
+
+delete student where name='유관순';
+
+
+
+연습) '축구의 역사'라는 도서의 출판사와 가격을 알고 싶어요
+select publisher, price from book where bookname='축구의역사';
+
+
+연습) 가격이 10,000원 이상인 도서명과 출판사를 검색(출력,보여)하세요
+select bookname, publisher from book;				(모든도서의 )
+select bookname, publisher from book where price >=10000;	(가격이 10,000원이상)
+
+
+연습) 모든 출판사 목록을 출력하세요.
+select publisher from book;		(중복된 모든 출판사의 목록이 나옴)
+select distinct publisher from book;	(중복된출판사1번만(distinct) 보여주세요)
+
+
+연습) 모든도서의 이름과 가격을 검색하기
+select bookname,price from book;
+
+
+연습) 모든고객의 이름과 전화를 출력하세요
+select name, phone from customer;
+
+
+연습) '박지성'고객의 주소와 고객번호를 출력하세요
+select address, custid from customer where name='박지성';
+
+
+연습) 가격이 20,000미만인 도서의 도서명과 도서번호를 출력하세요
+select bookname, bookid from book where price<20000;
+
+
+연습) 박지성 고객이 구매한 도서명과 출판사와 주문번호를 출력하세요
+select bookname, publisher, orderid			( 내가 알고싶은 속성(정보)
+	from book, customer, orders			( 순서는상관x
+	where book.bookid=orders.bookid and		( 같은bookid를 사용하는 2개의table /join한다
+	customer.custid=orders.custid and		( 같은custid를 사용하는 2개의table	
+	name='박지성';					( 속성을 알고싶은 주체
+
+
+연습) '축구의역사'도서를 구매한 고객의 이름, 주소, 구매가격, 구매일, 출판사를 출력하세요
+select name, address, price, orderdate, publisher
+	from customer c, orders o, book b		( customer c : customer를 c 라고 하겠다
+	where b.bookid=o.bookid and
+	c.custid=o.custid and
+	bookname='축구의역사';
+
+
+연습) 구매를 한 모든 고객의 이름을 출력하세요.
+select distinct name from orders o, customer c
+	where o.custid=c.custid;
+
+
+연습) '김연아' 고객이 주문한 모든 도서의 정보를 출력
+
+select bookid,bookname,publisher,price
+	// 어디 bookid인지 애매함 어느 bookid를 사용할껀지 정해주면 됨
+	from book b, orders o, customer c
+	where name='김연아' and 
+	b.bookid=o.bookid and
+	c.custid=o.custid;
+===>1행에 오류:
+ORA-00918: 열의 정의가 애매합니다
+
+< 수정 >
+select b.bookid,bookname,publisher,price	
+	from book b, orders o, customer c
+	where name='김연아' and 
+	b.bookid=o.bookid and
+	c.custid=o.custid;
+
+
+연습) '이상미디어' 에서 출판한도서를 구매한 고객의 정보를 출력
+select c.custid, name, address, phone
+	from orders o, customer c, book b
+	where c.custid=o.custid and
+	b.bookid=o.bookid and
+	publisher='이상미디어';
+
+
+연습) 도서번호 6번인 도서의 정보를 출력하세요
+select * from book where bookid=6;
+
+
+연습) 도서번호 6번을 주문한 고객의 정보를 출력하세요
+select o.custid, name, address, phone
+	from customer c,orders o,book b 
+	where c.custid=o.custid and
+	b.bookid=o.bookid and
+	o.bookid=6;
+
+pk속성을 공유한 table들...
+
+프로그램연습) 사용자한테 도서번호를 입력받아 해당도서를 구매한 고객의 정보를 출력하는
+		웹 어플리케이션 작성하기.
+
+
+
+***표현하고자하는 뷰페이지의 sql를 확인한후에 프로그래밍한다~
+
+프로그램연습) 사용자로부터 고객이름을 입력받아 해당고객이 구매한 도서의 목록을 출력하는
+		웹어플리케이션을 작성합니다
+
+select o.bookid, bookname, publisher, price 
+from book b, customer c, orders o 
+where name='김연아' and
+b.bookid=o.bookid and 
+c.custid=o.custid;
+
+<select name="bookid"> --> java의 콤보박스같은거
+
+
+연습)day0110에다가 추가해보자
+'이상미디어' 출판사의 도서를 구매한 고객의 id,고객이름,도서명,구매가격을 출력하세요.
+select c.custid, name, bookname, price
+from book b,customer c, orders o
+where b.bookid=o.bookid and
+c.custid=o.custid and
+publisher='이상미디어';
+
+프로그램연습) 사용자한테 출판사명(콤보박스 select)을 입력받아 해당도서를 구매한 
+	고객의 id, 고객이름, 도서명, 구매가격을 출력하는 
+	웹 어플리케이션을 작성하세욤.
+
+
+1) 모든 출판사 목록을 출력하세요-->콤보박스에 뿌려주는것
+select distinct publisher from book;
+
+2) 콤보박스 선택하면 새로만든자료형대로 정보를 뿌려준다
+
+
+
+
+
+
+=========================================================================================
+=========================================================================================
+
+'부서'라는 테이블을 만들자
+dept(dno*,dname,dloc)
+
+'사원'이라는 테이블
+emp(eno*,ename,job,sal,comm,mgr,hiredate,dno)
+
+create table dept(dno number primary key,dname varchar2(30),dloc varchar2(50));
+
+create table emp(eno number primary key,
+ename varchar2(30),
+jab varchar2(50),
+sal number,	( 급여
+comm number,	( 시간당수당
+mgr number,	( 관리자번호
+hiredate date,
+dno number references dept(dno));
+
+
+insert into dept values(100,'도토리','서울');
+insert into dept values(200,'하기나름','부산');
+insert into dept values(300,'출발개발팀','서울');
+insert into dept values(400,'자바잡아','광주');
+insert into dept values(500,'총무부','서울');
+
+
+insert into emp values(1000,'유진탁','사장',20000,0,null,'2000/01/03',500);
+
+insert into emp values(1001,'이동현','과장',500,50,1000,'2001/12/03',100);
+insert into emp values(1002,'이종호','대리',400,40,1001,'2010/12/03',100);
+insert into emp values(1003,'전은진','대리',400,40,1001,'2012/12/03',100);
+insert into emp values(1004,'홍수지','사원',300,30,1001,'2017/12/03',100);
+insert into emp values(1005,'서동욱','사원',300,30,1001,'2017/12/03',100);
+insert into emp values(1006,'박유철','사원',300,30,1001,'2019/12/03',100);
+insert into emp values(1007,'김정규','사원',300,30,1001,'2019/12/03',100);
+
+insert into emp values(1008,'주영현','과장',500,50,1000,'2010/04/07',200);
+insert into emp values(1009,'김찬휘','대리',400,40,1008,'2009/12/11',200);
+insert into emp values(1010,'김민주','대리',400,40,1008,'2015/01/07',200);
+insert into emp values(1011,'곽아름','사원',300,30,1008,'2016/02/07',200);
+insert into emp values(1012,'장채은','사원',300,30,1008,'2017/02/07',200);
+
+insert into emp values(1013,'이희재','과장',500,50,1000,'2015/05/06',300);
+insert into emp values(1014,'이수인','대리',400,40,1013,'2016/05/06',300);
+insert into emp values(1015,'현민아','대리',400,40,1013,'2016/05/06',300);
+insert into emp values(1016,'한주련','사원',300,30,1013,'2017/05/06',300);
+insert into emp values(1017,'이원우','사원',300,30,1013,'2017/05/06',300);
+insert into emp values(1018,'최영수','사원',300,30,1013,'2019/05/06',300);
+insert into emp values(1019,'최봉현','사원',300,30,1013,'2019/05/06',300);
+
+insert into emp values(1020,'이근희','과장',500,50,1000,'2015/05/06',400);
+insert into emp values(1021,'곽설아','대리',400,40,1020,'2014/05/06',400);
+insert into emp values(1022,'김혜선','대리',400,40,1020,'2013/05/06',400);
+insert into emp values(1023,'하지연','사원',300,30,1020,'2015/05/06',400);
+insert into emp values(1024,'박도형','사원',300,30,1020,'2018/05/06',400);
+insert into emp values(1025,'고요한','사원',300,30,1020,'2018/05/06',400);
+insert into emp values(1026,'유현성','사원',300,30,1020,'2019/12/11',400);
+
+
+
+연습) 서울에 근무하는 모든 사원의 사원번호,이름,부서번호,부서명,급여를 출력
+select eno,ename,d.dno,dname,sal 
+from dept d, emp e 
+where d.dno=e.dno and
+dloc='서울';
+
+연습) '박유철'의 근무지를 출력하세요
+select dloc from dept d, emp e 
+where d.dno=e.dno and
+ename='박유철';
+
+
+-----------------------------------------------------------------------------------------
+desc book;
+
+연습) 모든도서의 도서번호, 도서이름, 출판사, 가격을 검색하세요
+select bookid,bookname,publisher,price from book;
+== select*from book;
+
+연습) 도서테이블에있는 모든 출판사를 검색하세요.
+select publisher from book;
+select distinct publisher from book;		( 중복제거
+
+** 조건에 맞는 데이터를 검색하기 위해서는
+	where 절을 사용한다
+	where절에는 다양한 연산자를 이용하여 조건식을 표현할 수 있어요.
+
+연습) 가격이 20,000원 미만인 도서의 정보를 출력하세요
+select*from book where price<20000;
+
+연습) 가격이 10,000이상 20,000이하인 도서출력
+select*from book where price>=10000 and price<=20000;
+== select*from book where price between 10000 and 20000;
+
+연습) 출판사가 '대한미디어'이거나(or) '이상미디어'인 도서의 정보를 출력하세요
+select*from book where publisher = '대한미디어' or publisher = '이상미디어';
+== select*from book where publisher in ('대한미디어','이상미디어');
+
+연습) 출판사가 '굿스포츠'도 아니고(not in) '대한미디어'도 아닌 도서의 정보를 출력하세요
+select*from book where publisher not in ('굿스포츠','대한미디어');
+== select*from book where publisher != '굿스포츠' and publisher !='대한미디어';
+
+<< like연산자 >>=========================================================================
+문자열값이 특정 패턴을 만족하는 데이터를 검색하고자 할 때 사용.
+
+%	: 모르는 여러글자
+_	: 모르는 한글자
+
+~~~ where bookname like '축구%';
+==> 도서명이 "축구"로 시작하는 모든 글자
+	축구''
+	축구'아는 여자'
+	축구'공'
+
+~~~ where bookname like '축구_';
+	축구'왕'
+	축구'공'
+
+~~~ where bookname like '축구';
+~~~ where bookname = '축구';
+	축구
+
+
+~~~ where bookname like '%축구';
+==> 도서명이 '축구'로 끝나는 것 찾아줌
+	내가 아는 '축구'
+	누구라도 잘하는 '축구'
+
+~~~ where booknama like '%축구%';
+	내가 아는 '축구'
+	나의 꿈은 '축구'선수
+	'축구'아는 여자
+
+~~~ where bookname like '_축구_';
+	난'축구'왕
+	너'축구'왕
+	'축구'아는 여자(X)
+
+~~~ where bookname like '__축구';
+	나의'축구'
+	
+연습) 도서명이 '축구'를 포함하는 모든 도서를 출력
+select*from book where bookname like '%축구%';
+
+연습) 도서명이 '축구'를 포함하는 도서를 구매한 고객의 이름,고객번호,구매일,구매가격,도서명,출판사 출력
+select name,c.custid,orderdate,saleprice,bookname,publisher
+from orders o, customer c, book b
+where o.bookid=b.bookid and o.custid=c.custid and
+bookname like '%축구%';
+
+연습) 대한민국에 거주하는 고객의 이름, 주소를 출력
+select name,address from customer
+where address like '대한민국%';
+
+연습) 도서명의 두번째 글자가 '구'글자인 도서의 도서명, 가격을 출력하세요
+select bookname,price from book
+where bookname like '_구%';
+
+연습) '축구'에 관한 도서중에 가격이 20,000원 이상인 도서를 검색하시오
+select*from book where bookname like '%축구%' and price>=20000;
+
+연습) 출판사가 '굿스포츠' 혹은 '대한미디어'인 도서를 검색하시오
+select*from book where publisher = '굿스포츠' or publisher = '대한미디어';
+select*from book where publisher in ('굿스포츠','대한미디어');
+
+
+<< order by >>===========================================================================
+데이터를 정렬하여 출력하고 싶어요(종류별로 보고싶다)
+정렬: 순서대로 놓는것
+	오름차순*	(값이 작은것부터 순서대로	asc
+	내림차순	(값이 큰것부터 순서대로		desc
+
+select*from book;
+
+select*from book order by bookname;
+== select*from book order by bookname asc;
+select*from book order by bookname desc;
+
+연습) 모든 도서를 출판사명 순으로 정렬하기
+select*from book order by publisher;
+
+연습) 모든 도서를 출판사명 순으로 출력하고, 출판사가 동일할 때에는 가격이 높은순으로 출력하세요
+select*from book order by publisher, price desc;
+
+연습) '대한미디어'나 '이상미디어'의 도서중에 가격이 20,000원이상인 도서를 구매한
+	고객의 이름,주소,도서명,출판사,구매일,구매가격
+	을 출력하세요.
+	단, 구매일 순으로 출력하되 구매일이 동일할 때에는 구매가격이 높은 순으로 출력합니다
+	
+select name,address,bookname,publisher,orderdate,saleprice
+from customer c,book b,orders o
+where o.custid=c.custid and 
+o.bookid=b.bookid and 
+publisher in ('대한미디어','이상미디어') and 
+saleprice >= 10000 
+order by orderdate, saleprice desc;
+
+
+연습) '서울'이나 '광주'에 근무하는 직원들 중에 직원들의 이름의 성씨가 '이'씨인 
+	모든 직원들의 부서번호,부서명,근무지,사원명,급여,직급을 출력하세요.
+	단, 급여가 높을순으로 출력하되 동일할 때에는 이름순으로 출력합니다.
+
+select d.dno,dname,dloc,ename,sal,jab
+from dept d,emp e 
+where d.dno=e.dno and 
+dloc in ('서울','광주') and
+// (dloc= '서울' or dloc= '광주') and
+ename like '이%'
+order by sal desc ,ename;
+
+
+연습) 모든 직원들의 이름과 직위를 출력하세요
+select ename,jab from emp;
+
+연습) 도토리팀에 근무하는 직원들의 이름과 급여를 출력하세요
+select ename,comm 
+from emp e,dept d 
+where e.dno=d.dno and dname='도토리';
+
+연습) 도토리팀에 근무하는 직원들의 이름과 실수령액을 출력하세요
+					  (급여+수당)
+
+select ename, (sal+comm)
+from emp e, dept d
+where e.dno=d.dno and dname='도토리';
+
+
+
+연습) 도서번호1번인 도서의 이름
+select bookname from book where bookid=1;
+
+연습) 가격이 20000원 이상인 도서의 이름
+select bookname from book where price >= 20000;
+
+연습) '박지성'이 구매한 도서의 이름,가격,정가와 판매가격의 차이
+select bookname,name, price, (price - saleprice) 
+from book b, customer c, orders o
+where b.bookid=o.bookid and c.custid=o.custid and
+name = '박지성';
+
+**연습) '박지성'이 구매하지 않은 도서의 이름
+select bookname, name 
+from book b, customer c, orders o
+where b.bookid=o.bookid and c.custid=o.custid and
+name != '박지성';(XXXXX)
+(==> '박지성'이 구매하지 않는 도서목록을 출력하는 spl로는 부적합하다
+	모든 도서에서 출력하는것이 아니라 
+	구매가 일어난 도서중에 구매자가 박지성이 아닌 도서를 뽑아요.
+	만약 박지성이 구매한 도서를 다른사람도 구매하였다면
+	그 책이 출력 되어요.
+	또 모슨 도서중에 구매가 이루어지지 않은 도서는 출력되지 않는다!)
+
+(박지성이 산 책을 다른사람도 샀을수도 있음(orders table 기준으로 뽑아옴
+			혹은 도서목록에 있지만 구매이력이 없는 도서가 있을수도 있음
+			지금 알고싶은건 도서목록에서 박지성이 구매하지 않은 도서이름). 그때는
+
+===> minus(-) 
+
+
+모든도서목록 - 박지성이구매한 도서목록			// '박지성'이 구매하지 않은 도서목록을 나타낼때는
+select bookname from book				<--- 모든 도서 목록
+minus							<--- (-)
+select bookname from book b, customer c, orders o	<--- '박지성'이 구매한 도서목록
+where b.bookid=o.bookid and c.custid=o.custid and
+name = '박지성';
+
+
+연습) 모든 고객의 이름, 주소
+select name,address from customer;
+
+연습) 2014년 7월 4일 ~ 7월 7일 사이(between)에 주문받은 도서의 주문번호
+select orderid from orders where orderdate between '2014/07/04' and '2014/07/07';
+== select orderid from orders where orderdate >= '2014/07/04' and orderdate <= '2014/07/07';
+
+연습) 2014년 7월 4일 ~ 7월 7일 사이에 주문받은 도서를 제외(not between)한 도서의 주문번호
+select orderid from orders where orderdate not between '2014/07/04' and '2014/07/07';
+== select orderid from orders where orderdate < '2014/07/04' or orderdate > '2014/07/07';
+
+연습) 성이 '김'씨인 고객의 이름과 주소
+select name,address 
+from customer 
+where name like '김%';
+
+연습) 성이 '김'씨이고 이름이 '아'로 끝나는 고객의 이름과 주소
+select name, address
+from customer
+where name like '김%아';
+
+연습) 고객의 이름과 고객이 구매한 도서목록
+select name,bookname
+from book b,customer c,orders o
+where b.bookid=o.bookid and c.custid=o.custid;
+
+
+프로그램연습) 새로운 부서를 등록하는 웹어플리케이션을 작성합니다.
+(day0113)
+select max(dno)+100 from dept;
+
+
+<< 집계함수 >>
+sum, avg, count, max, min ...
+
+연습) 고객이 주문한 도서의 총 판매액을 출력
+select saleprice from orders;
+// select sum(saleprice) from orders;
+
+연습) 고객이 주문한 도서의 평균 판매액을 출력
+select avg(saleprice) from orders;
+
+연습) 고객이 주문한 도서의 최고 판매액을 출력
+select max(saleprice) from orders;
+
+연습) 고객이 주문한 도서의 최저 판매액을 출력
+select min(saleprice) from orders;
+
+연습) 모든 고객의 수를 출력
+select count(*) from customer;
+select count(name) from customer;
+select count(phone) from customer;
+
+select sum(saleprice) from orders;
+select sum(saleprice) as 총매출 from orders;
+
+연습) 2번 김연아 고객이 주문한 도서의 총 판매액을 출력하세요
+select sum(saleprice) from orders where custid=2;
+
+select sum(saleprice) from orders o, customer c
+where o.custid=c.custid and name='김연아';
+
+연습) 고객이 주문한 도서의 총 판매액, 평균값, 최저가, 최고가
+select sum(saleprice), avg(saleprice), min(saleprice), max(saleprice) from orders;
+
+연습) 모든 판매 건수
+select count(*) from orders;
+
+
+
+연습) '굿스포츠'에서 출판하는 모든 도서의 수를 출력
+select count(*) from book where publisher='굿스포츠';
+
+연습) '굿스포츠' 출판사의 총 매출액을 출력
+select sum(saleprice) 
+from orders o, book b
+where o.bookid=b.bookid and publisher='굿스포츠';
+
+연습) '굿스포츠' 출판사의 도서의 평균가격을 출력
+select avg(price)
+from book
+where publisher='굿스포츠';
+
+연습) '굿스포츠' 출판사의 총 매출액과 총 매출건수를 출력
+select sum(saleprice), count(*)
+from orders o, book b
+where o.bookid=b.bookid and publisher='굿스포츠';
+
+연습) '박지성'고객의 총 구매건 수 와 총 구매액, 평균구매액을 출력
+select sum(saleprice),avg(saleprice),count(*)
+from customer c, orders o
+where c.custid=o.custid and name='박지성';
+
+연습) '굿스포츠'의 도서의 최고비싼도서의 가격과 가장 싼 도서의 가격의 차이를 출력
+select max(price)-min(price)
+from orders o, book b
+where o.bookid=b.bookid and publisher='굿스포츠';
+
+연습) 직급이 '대리'이거나 '사원'인 사람들의 평균급여, 사람수를 출력
+select avg(sal),count(*)
+from emp
+where jab in ('대리','사원');
+
+select*from book;
+
+select sum(price) from book;			<--- 1건
+select bookname from book;			<--- 13행 
+
+select bookname, sum(peice) from book;(XXXX)	<--- 할 수 없음!
+		==> 집계함수는 column이름과 같이 올수 없어용 단, gropu by는 올 수 있다
+								(어느 고객이 얼마나 주문했는지 알고 싶다)
+	<< group by >>===========================================================
+	컬럼의 특정값의 종류별로 집계함수를 사용할 수 있어요.
+		
+	연습) 모든도서의 수를 출력
+	select count(*) from book;	<--- 결과의 행의 수 1건
+
+	연습) /출판사별/ 도서의 수를 출력
+	select count(*) from book group by publisher;	<--- 결과의 행의 수 출판사	
+	select publisher, count(*) from book group by publisher;
+
+=====>	PUBLISHER    COUNT(*)
+	---------- ----------
+	굿스포츠            3
+	삼성당              1
+	대한미디어          2
+	나무수              1
+	민음사              3
+	이상미디어          2
+	Person              1
+
+연습) 부서별 직원의 수를 출력하세요
+select dname, count(*) as 직원수 
+from emp e, dept d
+where e.dno=d.dno 
+group by dname;
+
+연습) 고객별 총 구매건수와 총 구매액, 평균구매액을 출력
+	단, 총 구매액이 높은순으로 출력합니다
+select name, count(*) as 총구매건수, sum(saleprice) as 총구매액, round(avg(saleprice),0) as 평균구매액
+from orders o,customer c
+where o.custid=c.custid
+group by name order by sum(saleprice) desc; 
+
+
+연습) 박지성의 총 구매액
+select sum(saleprice) as 총구매액 from customer c, orders o
+where c.custid=o.custid and
+name = '박지성';
+
+select sum(saleprice) 
+from orders
+where custid = (select custid from customer where name = '박지성');	--> subsql
+
+
+연습) 박지성이 구매한 도서의 수
+select count(o.bookid) as 도서의수 
+from orders o, customer c
+where c.custid=o.custid and
+name = '박지성';
+
+select count(*) as 도서의수 
+from orders o, customer c
+where c.custid=o.custid and
+name = '박지성';
+
+
+연습) 박지성이 구매한 출판사의 수
+select publisher as 출판사명, count(publisher) as 출판사의수
+from book b, customer c, orders o
+where b.bookid=o.bookid and c.custid=o.custid and
+name = '박지성'
+group by publisher;
+
+day0114
+**///
+연습) '서울'이나 '부산'에 근무하는 사람들의 부서별(group by) 근무자의 수, 평균급여를 출력
+
+select dname, count(*) as "근무자 수", round(avg(sal),0) as 평균급여
+from emp e, dept d
+where e.dno=d.dno and dloc in ('서울','부산')
+group by dname;
+
+==> 결과
+DNAME       근무자 수   평균급여
+---------- ---------- ----------
+총무부              1      20000
+출발개발팀          7        357
+도토리              7        357
+하기나름            5        380
+///**
+
+
+*** group by는 언제사용하나요?
+--> 분류된 카테고리중 하나의 카테고리가 알고싶은 목적이될때 걔를 중심으로 알고싶을때,,,,
+===> 집계함수(sum,avg,max,min,count)를 특정 컬럼의 값의 종류별로 나타내고자 할때 사용.
+	(~~별로 총합, 평균, 개수 ... 등등)
+
+**///-2
+연습) '서울'이나 '부산'에 근무하는 사람들의 부서별(group by) 근무자의 수, 평균급여를 출력
+	단, 부서별 근무자의 수가 5명이상인 부서만 출력하세요.
+
+select dname, count(*) as "근무자 수", round(avg(sal),0) as 평균급여
+from emp e, dept d
+where e.dno=d.dno and dloc in ('서울','부산')
+group by dname
+having count(*)>=5;
+
+*** having
+	==> group by절에 나타난 결과에 조건식을 적용
+
+==> 결과
+DNAME       근무자 수   평균급여
+---------- ---------- ----------
+출발개발팀          7        357
+도토리              7        357
+하기나름            5        380
+
+(( where -> group by -> having)
+
+연습) 구매금액이 8,000원 이상인 도서를 구매한 고객별 총 구매 건수를 출력
+select name, count(*) as 구매건수
+from orders o, customer c
+where c.custid=o.custid and
+saleprice >= 8000
+group by name;
+
+==> 결과
+NAME                   구매건수
+-------------------- ----------
+장미란                        2
+박지성                        1
+추신수                        3
+김연아                        1
+
+연습) 구매금액이 8,000원 이상인 도서를 구매한 고객별 총 구매 건수를 출력
+	단, 구매건수가 2건 이상인 고객만 출력
+
+select name, count(*) as 구매건수
+from orders o, customer c
+where c.custid=o.custid and
+saleprice >= 8000
+group by name
+having count(*)>=2;
+
+==> 결과
+NAME                   구매건수
+-------------------- ----------
+장미란                        2
+추신수                        3
+
+
+<< 2개이상의 테이블에서 자료 검색 >>=====================================================
+
+select * from customer;		<-- 8건
+select * from orders;		<-- 11건
+select * from customer, orders;	<-- 88건
+
+==> 2개이상의 테이들로 부터 데이터를 검색하려면 
+	조건식(조인식)을 표현해야 해요.
+		/->(두개 테이블에 공통으로 들어가는 컬럼으로)
+
+select * from customer, orders
+where customer.custid = orders.custid
+order by customer.custid;
+
+연습) 고객의 이름과 고객이 주문한 도서의 판매가격을 출력
+select name, saleprice
+from customer c, orders o
+where c.custid=o.custid
+order by name;
+
+연습) 고객별로 주문한 도서의 총판매액을 출력, 고객별로 정렬
+select name, sum(saleprice)
+from customer c, orders o
+where c.custid=o.custid
+order by name;
+
+연습) 부서별로 직원들의 평균급여를 출력하세요
+	부서별 순으로 정렬
+select dname, round(avg(sal),0) as 평균급여
+from emp e, dept d
+where d.dno=e.dno
+group by dname
+order by dname;
+
+- orders는 customer의 custid(부모의 주식별자 pk)를 참조키로 가진다
+- orders는 book의 bookid(부모의 주식별자 pk)를 참조키로 가진다
+
+참조무결성에 위배됩니다 (book table에 없는 bookid를 insert를 하려고한다면
+개체무결성에 위배됩니다 (동일한 pk를 insert하려고 한다면
+
+연습) 고객의 이름과 고객이 주문한 도서의 이름을 출력
+select name, bookname
+from customer c, book b, orders o
+where c.custid=o.custid and b.bookid=o.bookid;
+
+연습) 모든 직원들의 이름, 부서명을 출력하세요
+select ename, dname
+from emp e, dept d
+where e.dno=d.dno;
+
+<< 셀프조인 >>===========================================================================
+하나의 개체(table)에서 어떤 속성이 자신의 주 식별자를 참조하는 경우에 사용
+
+emp테이블(직원)의 mgr은 사원테이블의 eno를 참조해요!
+emp테이블(관리자)의 관리자번호 mgr은 사원테이블의 사원번호 eno를 참조해요!
+	===> 물리적으로(실제로) 테이블은 하나이지만, 에칭을 주어 
+		하나는 '사원', 하나는 '관리자'라고 설정하여 조인을 수행함.
+
+연습) 모든 직원들의 이름과 관리자이름을 출력
+emp e	직원
+emp m	관리자
+
+select e.ename, m.ename
+from emp e, emp m
+where e.mgr=m.eno;
+
+연습) '박도형'직원의 관리자 이름을 출력
+select m.ename
+from emp e, emp m
+where e.mgr=m.eno and
+e.ename = '박도형';
+
+연습) '이희재'의 부하직원을 모두 출력
+select e.ename 
+from emp e, emp m
+where e.mgr=m.eno and
+m.ename = '이희재';
+
+연습) 자신의 관리자보다 입사일이 빠른 직원의
+	이름, 관리자이름, 자신의 입사일, 관리자입사일 을 출력
+select e.ename as 직원명, m.ename as 관리자, e.hiredate as 직원입사일, m.hiredate as 관리자입사일
+from emp e, emp m
+where e.mgr=m.eno and
+e.hiredate < m.hiredate;
+
+column 직원명 format a10;
+column 관리자 format a10;
+column 직원입사일 format a10;
+column 관리자입사일 format a10;
+
+연습) '서울'이나 '부산'에 근무하는 관리자 별 총 부하직원의 수를 출력하세요
+	단, 부하직원의 수가 3명이상인 관리자만 출력
+
+select m.ename, count(*)
+from emp e, emp m, dept d
+where e.mgr=m.eno and d.dno=m.dno and dloc in ('서울','부산')
+			    \==> 관리자가 근무하는 근무지가 조건으로 걸려있음
+group by m.ename
+having count(*)>=3;
+
+연습) 도서의 가격이 20,000원인 도서를 구매한 고객의 이름과 도서의 이름을 출력
+select name, bookname
+from book b, customer c, orders o
+where b.bookid=o.bookid and c.custid=o.custid
+and price = 20000;
+
+연습) 고객의 이름과 고객이 주문한 도서의 가격 출력
+select name, saleprice
+from orders o, customer c
+where c.custid=o.custid;
+
+==> 박세리, 홍길동은 주문한적이 없어서 안나옴
+	근데 모두 나오게 하고싶으면 outer join (on)사용
+
+연습) 고객의 이름과 고객이 주문한 도서의 가격 출력
+select name, saleprice
+from orders o right outer join customer c
+on c.custid=o.custid;
+
+==> 결과
+NAME                  SALEPRICE
+-------------------- ----------
+박지성                     6000
+박지성                     2100
+김연아                     8000
+장미란                     6000
+추신수                    20000
+박지성                    12000
+추신수                    13000
+장미란                    12000
+추신수                     8000
+김연아                     7000
+장미란                    13000
+
+NAME                  SALEPRICE
+-------------------- ----------
+홍길동
+지연
+박세리
+하지연
+
+=================================================
+
+연습) 모든 직원의 이름과 관리자이름을 출력
+	관리자가 없는 사람도 출력
+
+select e.ename, m.ename
+from emp e left outer join emp m
+on e.mgr=m.eno;
+
+(== 같은결과)
+select e.ename, m.ename
+from emp, emp m
+where e.mgr=m.eno(+);
+
+==> 결과
+ENAME      ENAME
+---------- ----------
+이동현     유진탁
+주영현     유진탁
+이희재     유진탁
+이근희     유진탁
+	.
+	.
+	.
+ENAME      ENAME
+---------- ----------
+하지연     이근희
+박도형     이근희
+고요한     이근희
+유현성     이근희
+유진탁
+
+--> 관리자가 없는 직원도 나온다 outer join을 했기때문에
+
+=================================================
+
+연습) 직원명, 부서명을 출력하세요
+	(부서명은 모두 나타내도록 하세요)
+select ename, dname
+from emp e right outer join dept d
+on e.dno=d.dno;
+
+==> 결과
+	.
+	.
+	.
+ENAME      DNAME
+---------- ----------
+김혜선     자바잡아
+하지연     자바잡아
+박도형     자바잡아
+고요한     자바잡아
+유현성     자바잡아
+           직원식당
+           개발팀
+
+--> 사원이없는 부서도 나타내준다
+
+(== 같은결과)
+select ename, dname
+from emp e, dept d
+where e.dno(+)=d.dno;
+
+=================================================
+************************
+<< 서브쿼리(중첩질의) >>=================================================================
+sql문 안에 sql문
+
+연습) 가장 비싼 도서의 도서명을 출력
+select max(price)
+from book;
+==> 35000
+
+select bookname
+from book
+where price = 35000;
+==> 골프바이블
+
+쿼리문을 2번써야 결과를 알수있을때 쿼리문안에쿼리문을 넣어서 표현하자
+select bookname
+from book
+where price = (select max(price) from book);
+
+==> 결과
+BOOKNAME
+--------------------
+골프 바이블
+
+연습) 주문한 고객의 id를 출력
+select distinct custid from orders;
+==> 결과
+CUSTID
+------
+     1
+     2
+     4
+     3	<--- 4건
+
+연습-1) 주문한 고객의 이름 출력(서브쿼리)
+select name from customer
+where custid = (select distinct custid from orders);
+==> 오류
+2행에 오류:
+ORA-01427: 단일 행 하위 질의에 2개 이상의 행이 리턴되었습니다.
+
+그때 ===> '다중행 연산자'를 쓴다
+		in,		=
+		all, any, some	비교연산자 >= < > <=
+	~~~ where age >= (서브쿼리)	
+			   만약에 서브쿼리 건수가 여러건이라면
+			   all >= (서브쿼리
+			   any >= (서브쿼리
+			   some >= (서브쿼리
+
+			
+연습-2) 주문한 고객의 이름 출력(서브쿼리)
+select name, custid from customer
+where custid in (select distinct custid from orders);
+
+==>결과
+NAME                 CUSTID
+-------------------- ------
+박지성                    1
+김연아                    2
+장미란                    3
+추신수                    4
+
+연습) '대한미디어' 출판사의 도서를 구매한 고객의 이름을 출력
+select name from customer 
+where custid in (select custid from orders 
+	where bookid in(select bookid from book where publisher='대한미디어'));
+==> 결과
+NAME
+--------------------
+박지성
+
+연습) '서울'이나 '광주'에 근무하는 사원들의 이름, 실수령액를 출력하세요
+	실 급여가 높은순으로 출력
+
+select dno from dept where dloc in ('서울','광주'); --> '서울'이나 '광주'에 근무하는 부서번호
+
+select ename, comm+sal from emp where dno in (select dno from dept where dloc in ('서울','광주'))
+		--> '서울'이나 '광주'에 근무하는 부서번호를 쓰는 직원이름
+
+연습) 이근희의 부서명과 위치를 출력
+	(서브쿼리 이용)
+select dname, dloc from dept where dno in (select dno from emp where ename in (select ename from emp where ename = '이근희'));  
+== select dname, dloc from dept where dno = (select dno from emp where ename = '이근희');
+
+연습) 박지성이 구매한 도서의 도서명, 출판사를 출력
+	(서브쿼리 이용)
+select bookname, publisher from book 
+where bookid in (select bookid from orders where custid = (select custid from customer where name = '박지성'));
+
+연습) 주문하지 않은 고객의 이름
+	(서브쿼리 이용)
+select distinct custid from orders; <- 고객번호
+
+select name from customer where custid not in (select distinct custid from orders);
+
+	--> 동명이인이 있다면 
+select distinct name from customer 
+where custid not in (select distinct custid from orders);
+
+
+<< 서브 쿼리 >>==========================================================================
+질의문 안에 포함되는 또다른 질의문을 말한다
+
+서브쿼리가 올 수 있는 곳
+	select 절
+	from 절
+	where 절
+
+연습) '서울'이나 '광주'에 근무하는 사원들의 이름, 실수령액를 출력하세요
+	실 급여가 높은순으로 출력
+select ename, (select dname from dept d where d.dno=e.dno) dname, sal+comm from emp e 
+where dno in (select dno from dept where dloc in ('서울','광주'))
+order by sal+comm desc;
+
+연습) 도서의 평균 가격보다 비싼 도서명
+select bookname, price from book where price > ( select avg(price) from book);
+==> 결과
+BOOKNAME                PRICE
+-------------------- --------
+축구의이해             22,000
+골프 바이블            35,000
+야구의 추억            20,000
+
+select avg(price) from book
+==> 결과
+AVG(PRICE)
+----------
+13384.6154
+
+연습) 출판사 별로 평균도서가격보다 더 비싼 도서의 정보를 출력
+select bookname, price from book b1 where
+price > (select avg(price) from book b2 where b1.publisher = b2.publisher);
+
+연습) 주문하지 않은 고객의 이름을 출력
+select name from customer
+minus
+select name from customer
+where custid in (select custid from orders);
+
+<< exisits >>============================================================================
+서브쿼리의 건수가 여러건일때 사용하는 다중행연산자 중 하나입입니다
+서브쿼리의 건수가 하나라도 존재한다면 메인쿼리를 수행하라는 의미이다
+
+select name, address from customer c
+where exists (select*from orders o where c.custid=o.custid);
+
+
+=========================================================================================
+
+<< 데이터베이스 명령어 >>================================================================
+
+1. DDL	데이터 정의어
+	데이터베이스를 생성하거나 구조를 변경하는 명령어
+2. DCL	데이터 제어어
+	사용자 권한을 부여하거나 제거하는 명령어
+3. DML	데이터 조작어
+	데이터를 추가, 수정, 삭제 조회하는 명령어
+
+<< 제약의 종류(constraint) >>============================================================
+
+null		값을 생략할 수 있어요
+not null	값을 생략할수 없어요
+unique		값이 유일해야해요
+default		값을 생략하면 기본값을 적용해요
+check		조건식을 만족하는 값이여야 해요
+primary key	값을 생략할 수 없고 유일해야 해요(not null+unique)
+foreign	key	관계에 있는 부모객체의 주식별자에 나타난 값만 허용해요
+
+1) create table member(
+id varchar2(20) not null, 
+pwd varchar2(20) not null, 
+name varchar2(20) null,
+age number);
+
+insert into member values('tiger','1234','홍길동',null);
+insert into member values('lion','lion',null,null);
+insert into member(id,pwd,name) values('kim','kim','김유신');
+insert into member(name,pwd,id) values('이순신','1234','lee');
+insert into member(id,pwd) values('korea','1234');
+
+
+2) create table member(
+id varchar2(20) unique,
+pwd varchar2(20) not null,
+name varchar2(20) null);
+
+insert into member values(null, 'tiger','홍길동');
+==> null을 허용한다
+
+insert into member values('tiger','tiger','홍길동');
+==> 결과
+SQL> insert into member values('tiger','tiger','홍길동');
+
+1 개의 행이 만들어졌습니다. 
+
+SQL> insert into member values('tiger','tiger','홍길동');  // ==> 이미있는 tiger를 또 만들려고하니
+insert into member values('tiger','tiger','홍길동')			중복허용 xxxxx
+*
+1행에 오류:
+ORA-00001: 무결성 제약 조건(C##MADANG.SYS_C007317)에 위배됩니다
+
+
+3) create table member(
+id varchar2(20) primary key,
+pwd varchar2(20) not null,
+name varchar2(20));
+
+insert into member values(null,'tiger','이순신');
+==> 결과
+SQL> insert into member values(null,'tiger','이순신');
+insert into member values(null,'tiger','이순신')
+                          *
+1행에 오류:
+ORA-01400: NULL을 ("C##MADANG"."MEMBER"."ID") 안에 삽입할 수 없습니다
+
+
+
+insert into member values('tiger','1234','이순신');
+insert into member values('tiger','1234','이순신');
+==>결과
+SQL> insert into member values('tiger','1234','이순신');
+insert into member values('tiger','1234','이순신')
+*
+1행에 오류:
+ORA-00001: 무결성 제약 조건(C##MADANG.SYS_C007319)에 위배됩니다
+	===> 개체무결성
+	===> 모든 튜플(레코드)는 주식별(pk)에 의해서 구별되어야 하는데
+			그렇지 않은 상황을 말합니다
+
+
+4) create table member(
+id varchar2(20) primary key,
+pwd varchar2(20) not null,
+name varchar2(20) unique,
+age number default 20);
+
+
+insert into member values('tiger','1234','홍길동',default);
+insert into member(id,pwd) values('lee','lee1234');
+
+column id format a10;
+column pwd format a10;
+column name format a10;
+column age format 9999;
+
+
+
+5) create table member(
+id varchar2(20) primary key,
+pwd varchar2(20) not null,
+name varchar2(20) unique,
+age number check(age>=20));
+
+insert into member values('tiger','tiger','이순신',30);
+insert into member values('hong','hong','홍길동',10);
+==> 결과
+SQL> insert into member values('hong','hong','홍길동',10);
+insert into member values('hong','hong','홍길동',10)
+*
+1행에 오류:
+ORA-02290: 체크 제약조건(C##MADANG.SYS_C007324)이 위배되었습니다
+
+
+<< 테이블 구조의 변경 alter >>===========================================================
+alter table 테이블명
+	add~		새로운 컬럼 추가
+	drop~		컬럼 삭제
+	modify~		컬럼 수정
+
+create table member(id varchar2(20) primary key, pwd varchar2(20), name varchar2(20));
+
+alter table member add addr varchar2(20);	<-- 칼럼추가
+alter table member drop column pwd;		<-- 칼럼삭제
+
+alter table member add age varchar2(20);
+alter table member modify age number;		<-- 컬럼수정
+
+===> 만약 테이블에 데이터가 있다면 수정하고자하는 자료형으로 표현가능한 형태로 변경한 후
+	수정해야한다
+
+<< 테이블의 삭제 drop >>=================================================================
+drop table 테이블명
+
+<< emp테이블의 레코드와 구조를 복사하여 새로운 테이블을 생성한다 >>======================
+create table 테이블명 as select ~~~
+
+create table emp100 as select*from emp;
+---> emp테이블의 구조와 내용을 복사하여 emp100생성
+
+create table emp100 as select*from emp where 1=2;
+---> emp테이블과 같은 구조 emp100생성
+
+insert into emp100 select*from emp where dno=100;
+---> emp 테이블의 부서번호가 100번인 레코드만 검색하여 emp100테이블에 추가
+
+
+<< 자료의 수정 update>>==================================================================
+update 테이블명 set 컬럼1=값1 where 조건식
+
+update customer set address='대한민국 부산' where custid=5;
+
+연습) 박세리의 주소를 김연아의 주소와 동일하게 수정
+update customer set address=(select address from customer where name = '김연아') 
+where name='박세리';
+
+
+<< 데이터의 삭제 delete>>================================================================
+delete from 테이블명 where 조건식
+
+연습) 고객번호 5번을 삭제하세요
+delete from customer where custid=5;
+
+commit		==> DML(insert, update, delete) 반영
+rollback	==> DML(insert, update, delete) 취소
+
+
+
+
+<< 서브쿼리 >>
+질의문 안에 포함되는 또다른 질의문을 말한다
+
+	서브쿼리의 위치
+	select 절
+	from 절	--> 질의문을 가상의 테이블로 본다. 에칭을 줄 수 있음
+	where 절
+
+	select 칼럼1, (select~~~) 
+
+<< 다중행 연산자 >>
+in
+any, some, all, exist
+서브쿼리의 건수가 여러건일때 사용하는 연산자 입니다.
+
+
+72page 문제들
+
+SQL> desc dept;
+ 이름                                      널?      유형
+ ----------------------------------------- -------- ---------------
+
+ DNO    부서번호                                NOT NULL NUMBER
+ DNAME  부서이름                                    VARCHAR2(30)
+ DLOC   부서위치                                    VARCHAR2(50)
+
+SQL> desc emp;
+ 이름                                      널?      유형
+ ----------------------------------------- -------- ---------------
+
+ ENO    사원번호                                NOT NULL NUMBER
+ ENAME  사원이름                                    VARCHAR2(30)
+ JAB    직위                                         VARCHAR2(50)
+ SAL    급여                                        NUMBER
+ COMM   수당                                        NUMBER
+ MGR    관리자                                      NUMBER
+ HIREDATE     입사일                                DATE
+ DNO          부서번호                              NUMBER
+
+1. 사원의 이름과 직위를 출력
+	사원의이름은 '사원번호' 직위는 '사원직위'머리글이 나오도록
+select ename as 사원번호, jab as 사원직위 from emp;
+
+2. 300번 부서에 근무하는 모든 사원의 이름과 급여를 출력
+select ename, sal from emp where dno=300;
+
+3. 사원번호와 이름, 현재급여, 증가된 급여분(증가액), 
+	10%인상된 급여(인상된 급여)를 사원번호 순으로 출력
+select ename, sal, sal+(sal*0.1) as 인상된급여 from emp;
+
+*4. '김'으로 시작하는 모든 사원과 부서번호를 출력
+select ename, d.dno from emp e, dept d where d.dno=e.dno and ename='김%';
+
+5. 모든 사원의 최대 및 최소급여, 합계 및 평균 출력
+		max,min		sum	avg
+select max(sal), min(sal), sum(sal+comm), avg(sal) from emp;	
+
+*6. 업무 이름과 업무별로 동일한 업무를 하는 사원의 수 출력
+	열이름을 각각 '업무'와 '직책별 사원수'로 한다
+
+
+7. 사원의 최대 급여와 최소급여의 차액을 출력
+select max(sal)-min(sal) from emp;
+
+8. 300번 부서의 구성원 수와 사원들 급여의 합계와 평균을 출력
+select count(*), sum(sal), avg(sal) from emp where dno=300;
+
+*9. 평균급여가 가장 높은 부서의 번호를 출력
+select d.dno from dept;
+
+select d.dno from dept where max>(select avg(sal) from emp);
+
+max(select avg(sal) from emp) -> 가장 높은 평균급여
+select avg(sal) from emp -> 평균급여
+
+10. 과장을 제외하고 각 업무별 총 급여가 300이상인 각 업무에 대해서
+	업무명과 각 업무별 평균급여를 출력
+	단, 평균급여를 내림차순으로 출력
+select jab, avg(sal+comm) from emp where sal+comm >= 500 group by jab;
+
+11. 전체 사원 가운데 직속상관이 있는 사원의 수를 출력
+
+
+12. emp테이블에서 이름,급여,comm금액과 총액(sal+comm)을 구하여
+	총액이 많은 순서대로 출력
+select ename, sal, comm, sal+comm as 총액 from emp order by 총액 desc;
+
+13. 각 부서별로 같은 직급jab인 사람의 인원수를 구하여 부서번호, 업무이름, 인원수 출력
+
+
+14. 사원이 한명도 없는 부서의 이름을 출력
+
+
+15. 같은 직책인 사람의 수가 4명이상인 업무와 인원수를 출력
+16. 사원번호가 1010이상 1020이하인 사원의 이름을 출력
+17. 사원의 이름과 사원의 부서를 출력
+18. 사월의 이름과 팀장(mgr)의 이름을 출력
+19. 사원'하지연'보다 급여를 많이 받는 사람의 이름을 출력
+20. 사원이 일하는 부서번호 혹은 '광주'에 있는 부서번호를 출력
+
+
+day0115 //sql함수
+
+create table test(
+	title varchar2(20),
+	no number
+);
+
+insert into test values('aaaa',20);
+insert into test values('bbbb',-20);
+select abs(no) from test;
+
+
+
+select abs(-78) from dual;	--> 가상의 테이블 dual;
+
+select 78.6789 from dual;
+select round(78.6789,0) from dual;
+select round(78.6789,1) from dual;
+
+select 6759 from dual;
+select round(6759, -1) from dual;
+select round(6759, -2) from dual;
+
+연습) 고객별 평균주문금액을 백원 단위로 반올림한 값을 출력
+select custid, round(avg(saleprice),-2) as 평균금액 from orders
+group by custid;
+
+연습) 도서의 도서번호, 도서명, 출판사, 가격을 출력
+	단, 도서명의 '야구'를 '농구'로 변경한 후 출력
+select bookid,replace(bookname,'야구','농구') bookname,publisher,price from book;
+
+연습) 
+select title, length(title), lengthB(title) from test;
+insert into test values('홍',20);
+
+select name from customer;
+select substr(name,1,1) from customer;
+
+insert into customer values(7,'tiger','대한민국 서울','1111');
+insert into customer values(8,' tiger','대한민국 부산','2222');
+insert into customer values(9,'tiger ','대한민국 울산','3333');
+insert into customer values(10,'TIGER','대한민국 전주','4444');
+insert into customer values(11,' tiger ','대한민국 경주','5555');
+
+이름이 tiger인 회원을 출력
+select*from customer where name='tiger';	--> 1
+
+select*from customer where lower(trim(name))='tiger';	--> 공백없애주고 소문자로 바꿔줘
+==> 결과
+CUSTID NAME                 ADDRESS                        PHONE
+------ -------------------- ------------------------------ -------
+     7 tiger                대한민국 서울                  1111
+     8  tiger               대한민국 부산                  2222
+     9 tiger                대한민국 울산                  3333
+    10 TIGER                대한민국 전주                  4444
+    11  tiger               대한민국 경주                  5555
+
+SQL> delete from customer where custid>=7;	--> 7,8,9,10,11 삭제
+5 행이 삭제되었습니다.
+
+
+select '2020/01/05' from dual;	--> 문자열 데이터
+select 'hello' from dual;
+
+select to_date('2020/01/05','yyyy/mm/dd') from dual;
+TO_DATE(
+--------
+20/01/05
+
+select to_date('2020/01/05','yyyy/mm/dd')+5 from dual;		--> 5일 후
+TO_DATE(
+--------
+20/01/05
+
+연습) 마당서점은 주문일로부터 10일 후 매출을 확정한다
+	각 주문의 확정일을 출력
+select orderid, orderdate 주문일, orderdate+10 확정일 from orders;
+
+주문번호, 주문일 출력	/-> 자료형이 date형
+select orderid, to_char(orderdate,'yyyymmdd') from orders;
+select orderid, to_char(orderdate,'yyyymmdd d') from orders;
+select orderid, to_char(orderdate,'yyyymmdd day') from orders;
+select orderid, to_char(orderdate,'yyyymmdd dy') from orders;
+select orderid, to_char(orderdate,'yyyy') from orders;
+select orderid, to_char(orderdate,'mm') from orders;
+select orderid, to_char(orderdate,'dy') from orders;
+
+select sysdate-1 어제, sysdate 오늘, sysdate+1 내일 from dual;
+--> insert할때 날짜부분에 sysdate이라 넣어주~
+
+select*from test;
+select nvl(avg(no),0) from test;
+
+create table customer10 as select*from customer;	--> 테이블복사
+
+select max(custid)+1 from customer10;		--> max(custid)가 null이여서
+MAX(CUSTID)+1
+-------------
+
+select nvl(max(custid),0)+1 from customer10;
+NVL(MAX(CUSTID),0)+1
+--------------------
+                   1
+
+is null
+is not null
+
+전화번호가 null인 고객의 정보 출력
+select*from customer where phone is null;
+select*from customer where phone = null;	--> 이렇게 표현할 수 없다
+
+전화번호가 null이 아닌 고객의 정보를 출력
+select*from customer where phone is not null;
+
+insert into emp values(1027,'유관순','사원',null,null,1020,sysdate,400);
+
+select avg(sal) from emp;		<-- null인 항목은 제외
+select sum(sal)/28 from emp;		<-- 
+
+
+모든도서목록과 가격을 출력
+select rownum, bookname,price from book order by price desc;	-> 행번호 붙인담에 정렬함
+
+select rownum, bookname, price 
+from (select bookname,price from book order by price desc);
+--> 서브쿼리 이용해서 정렬을 먼저 진행한 다음 행번호를 붙인다
+
+연습) 가격이 가장 비싼 도서 3권을 출력
+select bookname, price from book order by price desc;	--> 가격이 비싼 순으로 정렬
+
+select rownum, bookname, price
+from(select bookname, price from book order by price desc)
+where rownum<=3;
+--> 가격이 높은 순으로 정렬한다음 행번호를 붙이고 1,2,3을 출력하면 그것이 가장비싼책가격3개임.
+
+연습) 각 고객별 구매수량을 출력
+select custid, count(*) from orders group by custid;
+select custid, count(*) from orders group by custid order by count(*) desc;
+
+연습) 구매수량이 가장 높은 상위 3명의 고객에게 
+	상품권을 발송하려고 합니다. 
+	해당고객의 이름을 출력하세요.
+
+select rownum, custid from(select custid, count(*) from orders group by custid order by count(*) desc)
+where rownum<=3;	--> 구매수량이 높은것
+
+select rownum, name, custid from customer
+where custid 
+in (select custid from(select custid, count(*) from orders group by custid order by count(*) desc)
+where rownum<=3);	--> 그 custid를 가진 고객의 이름을 출력
+
+		--> select절에 서브쿼리넣어줌 그 책들의 총합
+select name, (select sum(saleprice) from orders o where o.custid=c.custid) as sum 
+from customer c 
+where custid in (select custid from(select custid, count(*) from orders group by custid order by count(*) desc)
+where rownum<=3);
+==> 결과
+NAME                        SUM
+-------------------- ----------
+박지성                    20100
+추신수                    41000
+장미란                    31000
+
+
+연습) 판매량이 가장 저조한 두권의 도서를 절판하려고 합니다
+	해당도서의 이름과 출판사를 출력하세요.
+
+select b.bookid from orders o, book b where b.bookid=o.bookid; -> 판매한 도서
+
+select bookid from book
+minus
+select b.bookid from orders o, book b where b.bookid=o.bookid; -> 판매되지 않은 도서
+
+select bookid,bookname,publisher from book 
+where bookid in (select bookid from book minus
+select b.bookid from orders o, book b where b.bookid=o.bookid); -> 한권도 팔리지 않은 도서들
+
+------------------------------------------------------------------------------------------------------
+select bookid, count(*) from orders group by bookid order by count(*); -> bookid별로 책이 몇권팔렸나
+
+select rownum, bookid, cnt 
+from (select bookid, count(*) cnt from orders group by bookid order by count(*))
+where rownum <=2;	-> 그 걸 정렬해서 제일작은거 2권 무작위로
+==> count(*)를 기준으로 정렬하였기 때문에 
+	count(*)가 동일한 값이 여러개인 경우
+	custid가 언제라도 동일한 순서대로 나오지를 기대하기는 어렵다
+
+select bookid, bookname, publisher from book 
+where bookid in (select bookid 
+from (select bookid, count(*) cnt from orders group by bookid order by count(*))
+where rownum <=2);
+
+연습) 판매량 순으로 정렬하였을때 2번째 도서의 판매수량과
+	동일한 판매수량의 모든 도서를 절판의 대상으로 처리해 봅시다.
+
+select bookid 
+from (select bookid, count(*) cnt from orders group by bookid order by count(*))
+where (rownum<=2)=cnt;
+
+
+select bookid, count(*) cnt from orders group by bookid order by count(*); 
+------------------------------------------------------------------------------------------
+select rownum n, bookid, cnt 
+from(select bookid, count(*) cnt from orders group by bookid order by count(*));	== A
+==> 결과
+    ROWNUM BOOKID        CNT
+---------- ------ ----------
+         1      6          1
+         2      1          1
+         3      7          1
+         4      3          1
+         5      2          1
+         6      5          2
+         7     10          2
+         8      8          2
+--------------------------------------------------------------------------------------------
+select n, bookid, cnt from
+(select rownum n, bookid, cnt 
+from(select bookid, count(*) cnt from orders group by bookid order by count(*)))	== B
+where n=2;
+         N BOOKID        CNT
+---------- ------ ----------
+         2      1          1
+--------------------------------------------------------------------------------------------
+
+==> A중에 cnt가 B인 도서번호를 출력----------------------------------------
+select bookid from (A)		== C
+where cnt=(B);
+
+select bookid from (select bookid, count(*) cnt from orders group by bookid order by count(*))
+where cnt=(select cnt from
+(select rownum n, bookid, cnt 
+from(select bookid, count(*) cnt from orders group by bookid order by count(*)))
+where n=2);
+-------------------------------------------------------
+
+
+==> book테이블에서 도서번호 C에 해당하는 도서명, 출판사를 출력
+
+select bookid,bookname,publisher from book
+where bookid in (C);
+
+select bookid,bookname,publisher from book
+where bookid in (select bookid from (select bookid, count(*) cnt from orders group by bookid order by count(*))
+where cnt=(select cnt from
+(select rownum n, bookid, cnt 
+from(select bookid, count(*) cnt from orders group by bookid order by count(*)))
+where n=2));
+
+연습) 도서번호 별 판매수량을 출력
+	단 하나도 안팔린 책의 판매수량을 0 으로 출력
+select b.bookid bookid, count(o.bookid) cnt
+from book b left outer join orders o
+on b.bookid = o.bookid 
+group by b.bookid
+order by count(o.bookid);		===> A
+
+A의 결과에 행번호를 붙어셔 출력한다.
+select rownum n, bookid cnt from (A);
+
+select rownum n, bookid cnt from (select b.bookid bookid, count(o.bookid) cnt
+from book b left outer join orders o
+on b.bookid = o.bookid 
+group by b.bookid
+order by count(o.bookid));		===> B
+
+B중에 n이 2인 cnt출력			===> C
+select cnt from (B) where n=2;
+
+select cnt from (select rownum n, bookid, cnt 
+	from (select b.bookid bookid, count(o.bookid) cnt 
+		from book b left outer join orders o
+		on b.bookid = o.bookid
+		group by b.bookid order by count(o.bookid))) where n = 2;
+
+
+A중에서 cnt가 C와 동일한 bookid를 출력	===> D
+select bookid from (A) whrer cnt = (C);
+
+
+
+book 테이블중에 bookid가 D에 해당하는 도서명, 출판사
+select bookname, publisher from book where bookid in (D);
+
+
+<< rownum >> 
+	<=
+	>=
+
+	rownum을 다음과 같이 비교하려면 rownum을 적용한 가상의 테이블을
+	생성해야 한다
+		- rownum >= a and rownum <=b
+		- rownum = a
+
+
+
+months_between(날짜1,날짜2);
+	==> 두 날짜 사이의 개월수를 반환
+	==> 날짜1이 더 최근의 날이여야 함
+
+연습) 수지는 태어난지 몇개월이 되었는지 출력
+	'1999/11/12'
+select months_between(sysdate,'1988/11/08') from dual;
+
+연습) '서울'에 근무하지 않는 근무개월수가 60개월 이상인 직원들에게
+	특별상여금을 지급하려고 합니다.
+	상여금은 급여의 200%입니다.
+	대상자의 이름,부서명,관리자명,상여금 출력
+	부서명순으로 정렬하고 동일할 때는 이름순으로 정렬합니다.
+
+select dno from dept where dloc != '서울';	-> 서울에 근무하지 않는 부서번호
+
+select ename from emp where dno in (select dno from dept where dloc != '서울');	-> 서울에 근무하지 않는 직원이름
+
+select ename from emp where months_between(sysdate,hiredate) >= 60;	-> 60개월 이상 근무한 직원들
+
+
+select ename from emp 
+where
+dno in (select dno from dept where dloc != '서울') and months_between(sysdate,hiredate) >= 60;
+--> 60개월이상 근무하고, '서울'에 근무하지 않은 직원들의 이름
+
+select ename, dname, dloc, mgr, (sal+comm*2) 상여금 from emp e, dept d 
+where d.dno=e.dno and 
+d.dno in (select d.dno from dept where dloc != '서울') and months_between(sysdate,hiredate) >= 60;
+---------------------------------------------------------------------------------------------------------------------
+
+emp e	직원	
+emp m	관리자
+dept d	
+
+select e.ename, dname, m.ename, e.sal*2 상여금
+from emp e, emp m, dept d
+where e.mgr=m.eno and
+e.dno=d.dno and
+months_between(sysdate,e.hiredate) >= 60 and
+dloc != '서울'
+order by dname,e.ename;
+
+
+연습) '서울'에 근무하는 직원들은 입사일로부터 60개월이 지나면
+	1년동안 지방근무를 해야합니다
+	대상자의 이름, 부서명, 지방근무시작일을 출력하세요
+
+select ename, dname, add_months(hiredate,60)
+from emp e, dept d
+where d.dno=e.dno and
+dloc = '서울';
+
+연습) 2019년도에 입사한 직원들은 채용신체검사가 누락되어 다시 받아야합니다
+	해당직원들의 이름, 부서명, 관리자명, 입사일을 출력
+to_char(hiredate,'yyyy')
+
+select e.ename, dname, m.ename, e.hiredate
+from emp e, emp m ,dept d
+where e.mgr=m.eno and d.dno=e.dno and
+to_char(e.hiredate,'yyyy')='2019';
+
+
+연습) emp 테이블에 이메일을 위한 email컬럼(50)을 추가합니다
+alter table emp add email varchar2(50);
+
+연습) emp 테이블에 주민번호를 위한 jumin컬럼(20)을 추가합니다
+alter table emp add jumin varchar2(20);
+
+연습) 
+update emp set email='jin@google.com', jumin='590101-1234567' where ename='유진탁';
+
+update emp set email='dong@google.com', jumin='790101-1234567' where ename='이동현';
+update emp set email='ho@google.com', jumin='890101-1234567' where ename='이종호';
+update emp set email='jjin@google.com', jumin='700101-2234567' where ename='전은진';
+update emp set email='suji@google.com', jumin='991101-2234567' where ename='홍수지';
+update emp set email='ook@google.com', jumin='850714-1234567' where ename='서동욱';
+
+update emp set email='pych@google.com', jumin='771225-1234567' where ename='박유철';
+update emp set email='gyu@google.com', jumin='880726-1234567' where ename='김정규';
+update emp set email='ju00@google.com', jumin='790321-1234567' where ename='주영현';
+update emp set email='kim@google.com', jumin='590101-2234567' where ename='김찬휘';
+update emp set email='kiminju@google.com', jumin='891121-2234567' where ename='김민주';
+
+update emp set email='kor@google.com', jumin='890103-2234567' where ename='곽아름';
+update emp set email='jjang@google.com', jumin='831029-2234567' where ename='장채은';
+update emp set email='leehh@google.com', jumin='851218-1234567' where ename='이희재';
+update emp set email='suin@google.com', jumin='820404-2234567' where ename='이수인';
+update emp set email='mina@google.com', jumin='910215-2234567' where ename='현민아';
+
+update emp set email='janju@google.com', jumin='881109-2234567' where ename='한주련';
+update emp set email='woo@google.com', jumin='891110-1234567' where ename='이원우';
+update emp set email='choisu@google.com', jumin='891202-1234567' where ename='최영수';
+update emp set email='bong@google.com', jumin='800112-1234567' where ename='최봉현';
+update emp set email='lkh@google.com', jumin='890101-1234567' where ename='이근희';
+
+update emp set email='snow@google.com', jumin='890102-2234567' where ename='곽설아';
+update emp set email='khs@google.com', jumin='790105-2234567' where ename='김혜선';
+update emp set email='haji@google.com', jumin='890707-2234567' where ename='하지연';
+update emp set email='park@google.com', jumin='890108-1234567' where ename='박도형';
+update emp set email='goyo@google.com', jumin='790507-1234567' where ename='고요한';
+
+update emp set email='uhs@google.com', jumin='890101-1234567' where ename='유현성';
+update emp set email='yousoon@google.com', jumin='790101-2234567' where ename='유관순';
+
+연습) 모든직원들의 이름과 이메일, 주민번호를 출력
+select ename,email,jumin from emp;
+
+연습) 모든직원들의 이름과 아이디 출력
+select instr(email,'@') from emp;				-> @ 위치
+select ename, substr(email, 1, instr(email,'@')-1) id from emp;	-> email 의 1번째부터 @-1까지 짤라와라
+									그것이 바로 아이디
+
+연습) 2019년 이후에 입사한 서울에 근무하는 남자직원들은
+	입사일로부터 6개월 이내에 채용신체검사를 완료해야 합니다
+	해당직원의 이름, 입사일, 완료일을 출력
+select ename, hiredate, dloc, add_months(hiredate,6) 
+from emp e, dept d
+where d.dno=e.dno and
+to_char(hiredate,'yyyy') >= '2019' and 
+dloc = '서울' and
+substr(jumin, 8, 1)=1 ;		--> 남여 구분은 8번째자리숫자 1자리수로 알수있음
+
+select instr(jumin, '-') from emp;
+select substr(jumin, 8, instr(jumin,'-')-6)=1
+
+연습) '도토리'부서와 '자바잡아'부서에서는 1월달 생일자에 한하여
+	외식상품권을 지급하려고 합니다
+	대상자의 이름, 부서명, 관리자명, 생일을 출력
+							   /-> 이어붙여주세요~
+select e.ename, dname, m.ename, substr(e.jumin,3,2) || '/' || substr(e.jumin,5,2) bitrh
+from emp e, emp m, dept d
+where e.mgr=m.eno and d.dno=e.dno and
+substr(e.jumin,3,2) = 01 and
+dname in ('도토리','자바잡아');
+
+select substr(jumin,3,4) from emp; 생일
+--> subst 주빈번호에 3번째자리에서 4자리를 잘라와줘
+
+
+day0116
+--> 도서목록 추천하기
+
+
+day0117
+<< 상태 유지 기법 >>
+
+jsp의 내장객체인
+session을 이용합니다
+
+=========================================================================================
+모든 부서 목록을 출력하는 프로그램 작성
+select * from fept;
+
+=========================================================================================
+
+그리고 부서 등록을 위한 기능을 추가
+부서목록과 부서등록을 하나의 페이지에서 처리합니다.
+
+
+
+jsp 문장 구성 요소
+스크립트 릿	<%	자바문법	%>		==> 안에 온갖 자바 문법사용 가능
+
+표현식		<%=	변수명,값 등등	%>		==> 프로그램에 의해서 처리된 결과를 출력할 때 사용.
+	
+
+어떨때 executeQuery 수행하고
+어떨때 executeUpdate 사용하나요
+==> update는 정보를 바꿀때(insert, update,,?)
+Query는 sql를 받아서 뿌려줄때...? 예를들어 목록같은거
+
+
+=============================<< jdbc 연결 프로그래밍 절차 >>=============================
+1. jdbc 드라이버를 메모리로 로드한다
+	Class.forname("");
+2. db서버에 연결한다
+	DriverManager.getConnection("driver주소","사용자명","암호");
+	Connection conn = 
+		DriverManager.getConnection("jdbc:oracle:thin:@주소:포트번호:서비스","사용자명","암호");
+
+3. sql명령을 수행하기 위한 Statment 혹은 PreparedStatement 객체를 생성한다
+	Statement stmt = conn.createStatment();
+	
+	PreparedStatement는 어떨때 사용하나요?
+	예를 들어 새로운 부서를 등록하는 경우를 생각해보자
+	추가할 부서의 정보를 매개변수 dno, dname, dloc으로 전달받아
+	sql을 생성하는 경우 Statement로 표현하려면 
+
+	Strind sql = "insert into dept valeus("+dno+" ,'"+dname+"', '"+dloc+"')";
+	이와 같이 일일이 +연산자로 연결하는것은 번거로워요
+	이러한 경우 PreparedStatement를 이용하면
+	sql문장을 좀더 간결하게 표현할 수 있어요
+	sql에 표현되는 변수의 처리를 ?로 대신처리하고
+	실행하기 전에 ?에 값을 설정 해 줘요
+
+	Strinf sql = "insert into dely values(?,?,?)";
+	PreparedStatement sptmt = conn.PreparedStatement(sql);
+	pstmt.setInt(1,dno);
+	pstmt.setString(2,dname);
+	pstmt.setString(3,dloc);
+	
+	===> ?의 수와 값을 설정하는 수가 일치해야 한다
+	===> ?의 위치가 값을 설정하는 위치도 일치해야 한다
+
+
+4. sql명령을 실행한다
+	두가지 메소드를 이용합니다
+
+	ResultSet rs = stmt.executeQuery(sql);
+		==>sql명렁어가 select일때 사용
+		==> 검색한 결과를 ResultSet으로 반환
+
+	int re = stmt.executeUpdate(sql);
+		==> sql명렁어가 insert, update, delete 처럼
+			데이터베이스 변동이 있는 명령이 실행할 때 사용해요
+		==> 성공적으로 sql명령을 실행한 레코드의 수를 반환해요
+		
+		stmt.executeUpdate(sql)가
+		sql에 성공하면 언제라도 1인가요??? ===> NO
+		if(re==1){
+		}
+		if(re>0){
+		}		==> 상황에따라 조건을 달리 넣어준다
+=========================================================================================
+
+관게에 있는 두개의 테이블에서 참조되어 있는 자식레코드가 있을때
+부모테이블의 레코드는 삭제할 수 없어요
+
+예를들어 dept(dno*,dname,dloc)와
+emp(eno*,ename,...,dno**)가 서로 관게에 있고
+emp테이블의 sno는 dept테이블의 dno를 참조 하고 있을때
+
+만약 200번부서에 소속된 사원이 존재하고 있는데
+부서테이블에서 200번 부서를 삭제 할 수 없어요!
+
+만약 삭제를 꼭 해야하는 상황이라면
+emp테이블에 200번 부서의 사원들을 모두 다른부서로 이동시키거나
+모두 삭제한 후 부서테이블에서 삭제 할 수 있어요
+
+
+
+<< 게시판board >>========================================================================
+
+글번호	no		number		pk
+제목	title		varchar2(50)
+작성자	writer		varchar2(20)
+암호	pwd		varchar2(20)
+글내용	content		varchar2(3000)	<textarea rows="10" cols="80"></textarea>
+등록일	regdate		date
+조회수	hit		number
+
+테이블을 생성하고 게시물 등록, 목록을 출력하는 
+웹어플리케이션을 하나의 jsp에서 처리되도록
+
+create table board(no number primary key, title varchar2(50), writer varchar2(50), pwd varchar2(20), content varchar2(3000),
+	regdate date, hit number);
+
+insert into board values(2,'오늘의수영','박태환','1234','어푸어푸.',sysdate,0);
+
+
+day1220
+"Dao"에의
+CRUD 메소드 정의에 대한 쪽지시험
+C:	Create	insert
+R:	Read	select
+U:	Update	update
+D:	Delete	delete
+
+
+서브쿼리(subquery, 부속질의, 하위질의)
+==> sql문장 안에 포함되는 또다른 sql문장을 말한다.
+
+서브쿼리는
+	select	절에
+	from	절에
+	where	절에 올 수 있어요!
+
+<< 다중행 연산자 >>
+	서브쿼리가 where절에 올때 서브쿼리의 건수가 여러건일때 사용하는 연산자들 입니다.
+	==> in, all, any(some), exist
+
+=====>select *from book 
+	where bookid in (select bookid from orders);
+==> 결과
+2행에 오류:
+ORA-01427: 단일 행 하위 질의에 2개 이상의 행이 리턴되었습니다.
+
+
+
+'=' 연산자(와 비교연산자)를 서브쿼리에 적용하려면 그 결과가 1건일때만 사용할 수 있어요.
+만약 서브쿼리의 건수가 여러건이라면 '='대신에 'in'연산자를 사용해야 해요.
+
+
+=====>select*from book where price > (select avg(price) from book group by publisher);
+
+ ==> 결과                               
+1행에 오류:
+ORA-01427: 단일 행 하위 질의에 2개 이상의 행이 리턴되었습니다.	
+
+서브쿼리에 크기 비교연산자(<, >, <=, >=)를 사용하려면 서브쿼리의 건수가 한건일때만 사용할 수 있어요.
+
+서브쿼리에 건수가 여러건일때 
+비교연산자를 꼭 사용해야 한다면, 다중행연산자인any(some), all과 같이 사용해야해요!
+=====> select*from book where price > any,all (select avg(price) from book group by publisher);
+	==> any(some)	서브쿼리의 건수중 어떤 것이라도 조건을 만족한다면
+	==> all		서브쿼리의 건수 모두가 조건을 만족한다면
+
+
+고객별 총 구매금액을 출력
+select custid,(select name from customer c where c.custid=o.custid) name,
+sum(saleprice) from orders o group by custid;
+==>결과
+CUSTID NAME                 SUM(SALEPRICE)
+------ -------------------- --------------
+     1 박지성                        20100
+     2 김연아                        22000
+     4 추신수                        55000
+     3 장미란                        31000
+
+연습) 부서별 사원의 수를 출력(서브쿼리이용)
+select dname,(select count(*) from emp e where e.dno=d.dno group by dname) cnt from dept d; 
+
+select dno, count(*) from emp group by dno;
+select dno,(select dname from dept d where d.dno=e.dno) dname, count(*) from emp e group by dno;
+
+연습) 총무부를 제외하고 모든 부서별 평균급여보다 더 많은 급여를 받는 직원의 정보 출력
+
+select dno, avg(sal) from emp group by dno; --> 부서별 평균급여
+select*from emp where sal > all (select avg(sal) from emp where dno!=500 group by dno);
+
+연습) 총무부를 제외하고 부서별 평균급여의 최고값 보다 더 많은 급여를 받는 직원의 정보를 출력
+select*from emp where sal > (select max(avg(sal)) from emp where dno!=500 group by dno);
+
+	sal >	all(selec~~~)
+	sal >	select max(~~~)
+	===> any(some),all은 함수 max,min을 이용하여 단일행으로 표현할 수 있어요
+
+연습) 구매를 한 고객의 정보를 출력(서브쿼리사용)
+select*from customer where custid in (select custid from orders);
+
+day0121
+=========================================================================================
+String sql = "insert into customer values(?,?,?,?)";
+
+public int insertCustomer(CustomerVo c){
+	int re = -1;
+	String sql = "insert into customer values(?,?,?,?)";
+	try{
+		Connection conn = ConnectionProvaider.getConnection();
+		PredardStatement pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, c.getCustid());
+		pstmt.setString(2, c.getName());
+		pstmt.setString(3, c.getAddress());
+		pstmt.setString(4, c.getPhone());
+		re = pstmt.executeUpdate();
+		ConnectionProvider.close(null,pstmt,conn);
+	}catch(Exception e){
+	}
+
+	return re;
+
+}
+
+public int deleteCustomer(CustomerVo c){
+}
+
+public int updateCustomer(CustomerVo c){
+}
+
+public ArrayList<CustomerVo> listAll(){
+}
+=========================================================================================
+
+연습) 평균주문금액 이하의 주문에 대해서 주문번호와 금액을 출력
+select avg(saleprice) from orders;	--> 평균주문금액(9150) 레코드1건
+select orderid from orders where saleprice <= 9150;
+===> select orderid, saleprice from orders where saleprice <= (select avg(saleprice) from orders);
+
+
+
+***연습) 각 고객의 평균주문금액 보다 큰 금액의 주문내역에 대해서 
+	주문번호, 고객번호, 금액을 출력
+select avg(saleprice) from orders;	--> 모든주문내역의 평균
+select orderid, custid, saleprice from orders o1 where saleprice > (평균주문금액);
+
+===> select orderid, custid, saleprice from orders o1 where saleprice > 
+	(select avg(saleprice) from orders o2 where o1.custid=o2.custid) order by custid;
+
+select orderid, custid, saleprice from orders where saleprice > 
+	(select avg(saleprice) from orders) order by custid;
+
+- 1번고객의 모든 주문내역
+select*from orders where custid=1;
+- 1번고객의 평균주문금액
+select avg(saleprice) from orders where custid=1;
+
+
+연습) 대한민국에 거주하는 고객에게 판매한 도서의 총 판매액을 출력
+===> select sum(saleprice) from orders where custid in (select custid from customer where address like '%대한민국%');
+
+select custid from customer where address like '%대한민국%';	--> 대한민국에사는 custid
+
+
+연습) 3번고객이 주문한 도서의 최고금액보다 더 비싼 도서를 구입한 주문번호와 금액을 출력
+select max(saleprice) from orders where custid=1;	--> 1번고객이 구입한 금액중 가장 큰금액
+select saleprice from orders where custid=1;		--> 1번고객이 구입한 금액들
+
+===> select orderid, saleprice from orders where saleprice > all (select saleprice from orders where custid=1);
+							=    \> 다중행연산자를 써야함(건수가 여러건이니까)
+===> select orderid, saleprice from orders where saleprice > (select max(saleprice) from orders where custid=3);
+
+
+연습) 3번고객이 주문한 도서의 최저금액보다 더 싼 도서를 구입한 주문번호와 금액을 출력
+select min(saleprice) from orders where custid=3;	--> 3번고객이 구매한것중 제일 싼 도서금액(6000원)
+select saleprice from orders where custid=3;		--> 3번고객이 구매한 모든 구매건수
+
+===> select orderid, saleprice from orders where saleprice < all (select saleprice from orders where custid=3);
+===> select orderid, saleprice from orders where saleprice < (select min(saleprice) from orders where custid=3);
+	-->6000원보다 적은가격의 orderid와 가격만 나옴		
+
+
+연습) 대한민국에 거주하는 고객의 총주문금액을 출력
+- select sum(saleprice) from orders o, customer c
+	where c.custid=o.custid and address like '%대한민국%';
+
+- select sum(saleprice) from orders where custid in (select custid from customer where address like '%대한민국%');
+
+- select sum(saleprice) from orders o 
+	where exists (select*from customer c where o.custid=c.custid and address like '%대한민국%');
+
+====> 다 같은결과나옴
+SUM(SALEPRICE)
+--------------
+         53000
+=========================================================================================
+데이터베이스 명령어
+1. DDL
+2. DCL
+3. DML*
+	데이터 추가	insert ~
+	데이터 수정	update ~	
+	데이터 삭제	delete ~
+	데이터 검색	select ~
+
+연습) 다음과 같은 고객을 추가 봅니다
+	고객아이디 8, 이름 "서동욱", 주소 "대한민국 서울", 전화 "010-9000-0001"
+insert into customer values(8,'서동욱','대한민국 서울','010-9000-0001');
+insert into customer(custid, name, address, phone) values(8,'서동욱','대한민국 서울','010-9000-0001');
+
+** 자료의 수정
+-> update 테이블명 set 컬럼명1=값1, 컬럼명2=값2 where 조건식;
+연습) 8번고객의 주소 "대한민국 안양" 전화번호 "010-2232-2317"로 수정
+update customer set address='대한민국 안양',phone='010-2232-2317' where custid=8;
+ 
+SQL> select ename,dno,sal,comm from emp;
+ENAME        DNO        SAL   COMM
+---------- ----- ---------- ------
+유진탁       500     20,000      0
+이동현       100        500     50
+이종호       100        400     40
+전은진       100        400     40
+홍수지       100        300     30
+서동욱       100        300     30
+박유철       100        300     30
+김정규       100        300     30
+주영현       200        500     50
+김찬휘       200        400     40
+김민주       200        400     40
+
+ENAME        DNO        SAL   COMM
+---------- ----- ---------- ------
+곽아름       200        300     30
+장채은       200        300     30
+이희재       300        500     50
+이수인       300        400     40
+현민아       300        400     40
+한주련       300        300     30
+이원우       300        300     30
+최영수       300        300     30
+최봉현       300        300     30
+이근희       400        500     50
+곽설아       400        400     40
+
+ENAME        DNO        SAL   COMM
+---------- ----- ---------- ------
+김혜선       400        400     40
+하지연       400        300     30
+박도형       400        300     30
+고요한       400        300     30
+유현성       400        300     30
+유관순       400
+
+연습) '도토리'부서와 '자바잡아'부서의 급여와 수당을 10%인상하도록 합니다
+===> select ename, sal+(sal*0.1), comm+(comm*0.1) from emp 
+	where dno in (select dno from dept where dname in ('도토리','자바잡아'));
+
+====> update emp set sal=sal+(sal*0.1), comm=comm+(comm*0.1) 
+	where dno in (select dno from dept where dname in ('도토리','자바잡아'));
+
+select e.dno, dname, ename, sal, comm 
+	from emp e, dept d 
+	where d.dno=e.dno and dname in ('도토리','자바잡아');
+
+
+연습) 부하직원이 1명이라도 있는 모든 관리자의 급여를 10%삭감하도록 합시다.
+select d.ename, e.ename from emp e, emp d where e.mgr=d.eno order by d.ename;	--> 관리자명과 직원명
+select d.ename, count(e.ename) from emp e, emp d where e.mgr=d.eno group by d.ename;	--> 관리자와 직원 수
+select d.sal-(d.sal*0.1) from (팀원이1명이상있는 관리자 테이블) where 
+부하직원이 1명이상있는 관리자 이름(번호)
+select d.dno, d.ename from emp e, emp d where e.mgr=d.eno and count(e.ename) >= 1;
+
+
+- 부하직원이 있는 직원번호
+select m.eno, m.sal from emp m where exists (select*from emp e where e.mgr=m.eno); 
+
+=====> update emp m set sal=sal*0.9 
+	where exists (select*from emp e where e.mgr=m.eno);
+
+
+
+연습) '주영현'의 부하직원들의 수당을 50%인상하도록 합시다
+select e.ename, e.comm from emp e, emp d
+	where e.mgr=d.eno and d.ename = '주영현';	--> '주영현'의 부하직원 이름과 수당
+
+===> select ename, comm+(comm*0.5) from (select e.ename, e.comm from emp e, emp d
+	where e.mgr=d.eno and d.ename = '주영현');
+
+
+============> update emp set comm=comm*1.5
+			where mgr = (select eno from emp where ename='주영현');
+
+****** update, delete의 서브쿼리는 where 조건식 에 맞게 설정해주어야한다.
+
+	서브쿼리는 어디 어디 에 올 수 있나요??
+	select절이라면 select,from,where절 모두에 올수 있다
+	하지만, 명령어가 update라면 where절에 서브쿼리가 와야한다.
+	update 테이블명 set 컬럼명1=값1 where 조건식
+	===> 값1과 where 조건식에 서브쿼리가 들어간다
+
+
+SQL> select*from book10;
+BOOKID BOOKNAME             PUBLISHER     PRICE
+------ -------------------- ---------- --------
+    20 제3인류              민음사        9,500
+    21 제3인류 vol2         민음사        9,500
+     1 축구의역사           굿스포츠      7,000
+     2 축구아는 여자        나무수       13,000
+     3 축구의이해           대한미디어   22,000
+     4 골프 바이블          대한미디어   35,000
+     5 피겨 교본            굿스포츠      8,000
+     6 역도 단계별기술      굿스포츠      6,000
+     7 야구의 추억          이상미디어   20,000
+     8 야구를 부탁해        이상미디어   13,000
+     9 올림픽 이야기        삼성당        7,500
+
+BOOKID BOOKNAME             PUBLISHER     PRICE
+------ -------------------- ---------- --------
+    10 Olympic Champions    Person       13,000
+    22 제3인류 vol3         민음사       10,500
+
+**연습) 모든 도서의 가격을 출판사별 평균가격의 10%만큼 인상합니다
+update book10 b1 set price = 
+	price + (select avg(price)*0.1 from book10 b2 where b1.publisher=b2.publisher);
+
+select publisher, avg(price) from book10 group by publisher;
+
+연습) 모든 직원들의 급여와 수당을 부서별 평균급여 수당의 10%씩 인상하도록 합니다
+update emp set sal=(select avg(sal) from emp e, dept d where d.dno=e.dno group by dname)*1.1; 
+
+select dname, avg(sal) from emp e, dept d where d.dno=e.dno group by dname;	--> 부서별평균급여
+
+select avg(sal) from emp;
+select avg(comm) from emp;
+
+update emp e1 set 
+	sal=sal+(select avg(sal)*0.1 from emp e2 where e1.dno=e2.dno), 
+	comm=comm+(select avg(comm)*0.1 from emp e3 where e1.dno=e3.dno);
+
+<< 서브쿼리의 실행결과가 여러개의 컬럼일때 한꺼번에 여러개 칼럼 수정하기 >>
+<< 여러개의 컬럼을 한꺼번에 수정하고 싶어요 >>
+update emp set (sal,comm) = ();
+update emp set 컬럼1=값1, 컬럼2=값2;
+update emp set (컬럼1, 컬럼2) = (값1, 값2);
+====> 이경우에는 값이 서브쿼리(하위질의)만 올 수 있어요
+
+update emp set (sal,comm) = (select avg(sal)*0.1,avg(comm)*0.1 from emp);
+
+
+<< 자료의 삭제 >>
+delete 테이블명 where 조건식;
+
+연습) 출판사별 평균도서금액 이하의 도서를 삭제합니다
+delete book10 b1 where price <= (select avg(price) from book10 b2 where b1.publisher=b2.publisher);
+
+연습) 관리자보다 입사일이 빠른 사원을 삭제합니다
+delete emp where hiredate < (관리자의 입사일);
+delete emp e where hiredate < (select hiredate from emp m where e.mgr=m.eno);
+
+연습) 모든 부하직원보다 입사일이 늦은 관리자('이근희'1명)를 삭제
+delete emp where hiredate > (부하직원의 입사일);
+delete emp m where hiredate > all (select hiredate from emp e where e.mgr=m.eno);
+
+delete emp m where hiredate > (select max(hiredate) from emp e where e.mgr=m.eno);
+
+
+실험을 위하여 400번 부서의 관리자 인 이근희의 입사일을 오늘날짜로 수정해요
+update emp set hiredate=sysdate where ename='이근희';
+
+연습) 모든 부하직원들보다 입사일이 늦은 관리자 이름 검색
+select m.ename, m.dno from emp e, emp m 
+	where e.mgr=m.eno and m.hiredate > e.hiredate;
+
+select m.ename, m.dno from emp e, emp m 
+	where e.mgr=m.eno and m.hiredate > (각 모든 부서직원들의 입사일);
+
+select dno, hiredate from emp;
+
+select m.ename, m.dno from emp m 
+	where m.hiredate > (select e.hiredate from emp e where e.mgr=d.eno);
+=========================================================================================
+
+<< View >>===============================================================================
+	실제로는 존재하지 않는 가상의 테이블을 말합니다.
+
+	자주사용되는 아주 복잡한 검색을 위한 질의문이 있다면 
+	view를 만들어서 편리하게 사용할 수 있어요
+
+	===> 실제로는 존재하지 않은 가상의 테이블, 자주사용하는 복잡한 sql명령어를 마치 메소드 만드는것 처럼
+		미리 정의해 두는 것을 말한다
+
+view생성	--> create view view이름 as select~~
+view삭제	--> drop view view이름;
+
+	
+예) "200번 부서에 근무하는 직원들의 번호, 이름, 급여, 부서번호를 출력"
+	하는 경우가 빈번하다고 가정하자
+select eno, ename, sal from emp where dno=200;
+
+
+
+연습) 200번 부서에 근무하는 
+	직원들의 번호, 이름, 급여, 부서번호를 검색하는 emp200의 view를 생성해보자
+==> create view emp200 as select eno, ename, sal, dno from emp where dno=200;
+
+
+이제부터 200번 부서에 근무하는 직원들의 번호, 이름, 급여 부서번호를 
+검색하기위해서는 emp200을 이용할 수 있어요
+select*from emp200;	--> 내가 원하는 컬럼만 넣어서 만든 가상의 테이블
+
+
+>>> 실습을 위하여 orders에 몇개의 레코드를 추가해 봅시다.
+insert into orders values(16, 1, 8, 13000, sysdate);
+insert into orders values(17, 5, 7, 20000, sysdate);
+insert into orders values(18, 1, 6, 6000, sysdate);
+insert into orders values(19, 1, 5, 8000, sysdate);
+insert into orders values(20, 1, 8, 13000, sysdate);
+insert into orders values(21, 2, 1, 8500, sysdate);
+insert into orders values(22, 5, 7, 11000, sysdate);
+insert into orders values(23, 3, 8, 10000, sysdate);
+
+
+연습) 오늘 주문한 정보를 다음과 같은 컬럼으로 출력하는
+	view를 생성하고 결과를 확인하세요
+	(주문번호, 고객명, 도서명, 출판사, 도서가격, 구매가격을 주문번호 순으로 출력)
+create view ordersToday3 as select orderid, name, bookname, publisher, price, saleprice
+	from customer c, orders o, book b
+	where c.custid=o.custid and b.bookid=o.bookid
+	and to_char(orderdate,'yyyy/mm/dd')=to_char(sysdate,'yyyy/mm/dd');
+
+select*from ordersToday3 order by orderid;
+
+연습) 오늘날짜에 구매금액이 가장 높은 상위2명 고객의 정보를 출력하는 view생성하고 확인
+create view orderToday4 as select*from customer
+where custid in (select custid 
+from (select custid, sum(saleprice) 
+from orders 
+where to_char(orderdate,'yyyy/mm/dd')=to_char(sysdate,'yyyy/mm/dd')
+group by custid
+order by sum(saleprice) desc) where rownum<=2);
+
+select*from orderToday4;
+-----------------------------------------------------
+구매금액이 가장 많은 상위2명의 고객
+select custid, sum(saleprice) 
+from orders 
+where to_char(orderdate,'yyyy/mm/dd')=to_char(sysdate,'yyyy/mm/dd')
+group by custid;	--> 오늘구매한 고객아이디, 총합계
+
+select custid, sum(saleprice) 
+from orders 
+where to_char(orderdate,'yyyy/mm/dd')=to_char(sysdate,'yyyy/mm/dd')
+group by custid
+order by sum(saleprice) desc;		--> 고객id별로 주문금액의 총 합을 내림차순으로
+
+select custid from () where rownum<=2;
+select custid 
+from (select custid, sum(saleprice) 
+from orders 
+where to_char(orderdate,'yyyy/mm/dd')=to_char(sysdate,'yyyy/mm/dd')
+group by custid
+order by sum(saleprice) desc) where rownum<=2;		--> 그 구매금액 상위2명의 custid
+
+select*from customer
+where custid in (select custid 
+from (select custid, sum(saleprice) 
+from orders 
+where to_char(orderdate,'yyyy/mm/dd')=to_char(sysdate,'yyyy/mm/dd')
+group by custid
+order by sum(saleprice) desc) where rownum<=2);		--> 그 2명의 정보
+
+
+
+연습) 오늘날짜에 구매건수가 가장 높은 상위1권 도서의 정보를 출력하는 view생성하고 확인
+create view bookTop2 as select*from book
+where bookid in (select bookid from (select bookid, count(*) from orders 
+where to_char(orderdate,'yyyy/mm/dd')=to_char(sysdate,'yyyy/mm/dd')
+group by bookid
+order by count(*) desc)
+where rownum<=2);
+
+select*from bookTop2;
+--------------------------------------
+select bookid, count(*) from orders 
+where to_char(orderdate,'yyyy/mm/dd')=to_char(sysdate,'yyyy/mm/dd')
+group by bookid
+order by count(*) desc;		--> 오늘 구매한 책(bookid)을 구매권수가 높은순으로 출력
+					오늘날짜에 판매된 도서중 도서번호별 판매건수 출력
+
+select bookid from()
+where rownum<=2;
+select bookid from (select bookid, count(*) from orders 
+where to_char(orderdate,'yyyy/mm/dd')=to_char(sysdate,'yyyy/mm/dd')
+group by bookid
+order by count(*) desc)
+where rownum<=2;	--> 구매권수가 많은 상위 2권의 책(bookid)
+
+select*from book
+where bookid in (select bookid from (select bookid, count(*) from orders 
+where to_char(orderdate,'yyyy/mm/dd')=to_char(sysdate,'yyyy/mm/dd')
+group by bookid
+order by count(*) desc)
+where rownum<=2);	--> 그 책2권의 정보
+
+day0122
+0. << view만들기 >>
+연습) 300번 부서에 근무하는 직원들의 사원번호, 이름, 급여, 부서번호를
+	검색하는 view를 생성하고 결과를 확인 해 봅니다
+create view emp300 as select eno, ename, sal, dno from emp where dno=300;
+select*from emp300;
+
+select eno, ename, sal, dno from emp where dno=300;
+
+
+질문) 그럼, view와 테이블은 어떤차이가 있나요?
+	검색한 결과를 갖고 새로운 테이블을 만들 수 있잖아용...
+create table tb_emp300 as select eno, ename, sal, dno from emp where dno=300;	
+-------> table은 물리적으로 존재한다
+		view는 존재하지 않는다(개체가 만들어지지X)
+
+1. << view를 통해서 insert가 가능한가? ---> yes!
+insert into emp300 values(1500,'홍길동',450,300); ---> 추가됨
+==> view를 통해서 레코드를 추가 할 수 있어요.
+	실제로는 모테이블인 emp에 추가되어요.
+	view는 모테이블인 emp의 일부컬럼만으로 구성되어있기 때문에
+	view를통해 insert를 하려면 모테블의 나머지 컬럼들은 null을 허용해야해요.
+	만약, 모테이블의 컬럼중에 null을 허용하지 않은 컬럼이 있다면
+		view를 통한 레코드추가를 할 수 없어요.
+
+2. << view의 조건에 맞지 않는 레코드를 추가할 수 있을까요? ---> 모테이블엔 추가, view emp300엔 안나옴
+insert into emp300 values(1501,'이순신',500,500);
+==> view의 조건에 맞지않는 레코드를 추가할 수 있어요
+	모테이블인 emp에 추가되어용
+	그러나 view의 조건에 맞지 않으니 view에는 나타나지 않아요!
+
+<<< view에 옵션걸기 >>>
+~~ with check option
+~~ with read only
+
+3. << view를 통해 조건에 맞는 레코드만 추가하고 싶어요 >>
+create or replace view emp300 as 
+select eno, ename, sal, dno from emp where dno=300 with check option;	--> view조건에 맞는것만 추가할 수 있다
+
+--> 결과 --------------------------------------------------
+SQL> insert into emp300 values(1502,'안중근',600,500);
+insert into emp300 values(1502,'안중근',600,500)
+            *
+1행에 오류:
+ORA-01402: 뷰의 WITH CHECK OPTION의 조건에 위배 됩니다
+==> view생성시 조건에 맞지 않는 
+		레코드는 추가할 수 없어요!
+-----------------------------------------------------------
+
+4. << view를 통해서 검색만 하도록 하고 싶어요(select만 가능 insert,delete,update는 못하도록) >>
+create or replace view emp300 as
+select eno, ename, sal, dno from emp where dno=300 with read only;
+
+--> 결과 --------------------------------------------------
+SQL> insert into emp300 values(1503,'가나다',250,300);
+insert into emp300 values(1503,'가나다',250,300)
+*
+1행에 오류:
+ORA-42399: 읽기 전용 뷰에서는 DML 작업을 수행할 수 없습니다.
+-----------------------------------------------------------
+
+5. << view를 통한 데이터수정(option이 없어야 가능) >>
+create or replace view emp300 as
+select eno, ename, sal, dno from emp where dno=300;
+
+update emp300 set sal=500 where ename='이수인';
+update emp300 set dno=400 where ename='이수인';
+--> 둘다가능함
+
+6. << view를 통한 데이터삭제 >>
+delete emp300 where eno=1500;
+delete emp300 where eno=1502;
+
+7. view 
+	==> 실제로 물리적으로는 존재하지 않는 가상의 테이블을 말하여
+	1) 자주 사용하는 복잡한 select를 미리 만들어 두고 편리하게 사용
+	2) 보안유지상 테이블의 일부분만 특정 사용자에게 읽기,쓰기,검색,수정
+		권한을 부여하고자 하는 용도로 사용
+	
+0. 연습) emp table을 소유하고있는 소유자가	c##madang/madang
+	emp300 view에 대해서
+	300번 부서장에게	c##manager300/manager300
+	읽기만 가능한 권한은 부여하고자 합니다
+	
+	관리이사에게는		c##master/master
+	emp300 view에 대해서 읽기, 쓰기, 수정, 삭제 권한을 부여하고자 합니다
+
+- c##madang이 emp300 view를 생성하요
+create or replace view emp300 as
+select eno,ename,sal,dno from emp where dno=300 with check option;
+
+- system계정에 
+	두명의 사용자 계정을 생성하고 연결을 위한 권한을 부여합니다
+conn system/manager;
+
+create user c##manager300 identified by manager300;
+grant connect to c##manager300;
+
+create user c##master identified by master;
+grant connect to c##master;
+
+conn c##madang/madang
+
+- emp300의 소유자인 c##madang이 접속하여 
+	사용자 별로 emp300에 대한 권한을 다르게 부여합니다
+c##manager300	-> 읽기
+c##master	-> 읽기, 쓰기, 수정, 삭제
+
+<< 특정 table에 대한 사용자별 권한설정 >>
+insert
+select
+delete
+update
+
+grant 권한1,권한2,... on 테이블명 to 사용자명
+
+--> grant select on emp300 to c##manager300;
+--> grant insert, delete, update, select on emp300 to c##master;
+
+1. c##manager300이 접속하여
+	c##madang.emp300을 조회 해 봅시다.
+----------------------------------------------->>
+SQL> select*from c##madang.emp300;
+
+  ENO ENAME             SAL   DNO
+----- ---------- ---------- -----
+ 1013 이희재            500   300
+ 1014 이수인            400   300
+ 1015 현민아            400   300
+ 1016 한주련            300   300
+ 1017 이원우            300   300
+ 1018 최영수            300   300
+ 1019 최봉현            300   300
+-------------------------------------------------
+	c##madang.emp300에 insert해봅시다.
+----------------------------------------------->>
+SQL> insert into c##madang.emp300 values(2000,'홍길동',300,300);
+insert into c##madang.emp300 values(2000,'홍길동',300,300)
+                      *
+1행에 오류:
+ORA-01031: 권한이 불충분합니다
+-------------------------------------------------
+
+2. c##master에 접속하여
+	insert, update, delete, select 확인
+conn c##master/master
+SQL> select*from c##madang.emp300;
+SQL> insert into c##madang.emp300 values(2000,'홍길동',300,300);
+SQL> update c##madang.emp300 set sal=600 where eno=1013;
+SQL> delete c##madang.emp300 where eno=2000;
+
+===> 다 가능함
+----------------------------------------------->>
+SQL> update c##madang.emp300 set dno=400 where eno=2000;
+update c##madang.emp300 set dno=400 where eno=2000
+                 *
+1행에 오류:
+ORA-01402: 뷰의 WITH CHECK OPTION의 조건에 위배 됩니다
+===> 최초에 설정한 조건에 맞는것만 수정이 가능하다.
+	c##master는 emp300에 대해 수정할 수 있는 권한은 있으나
+	view의 생성조건에는 위배되는 값으로는 수정할 수 없다.(~~ with check option 조건을 걸어놨기때문)
+-------------------------------------------------
+
+view하고 table하고 뭐가달라요?
+==> 만약 insert를 수행한다면 view는 모테이블에 반영이 되요
+	그러나 테이블은 모테이블에 반영이 안되요(별도의 테이블이다)
+
+0. << 인덱스 >>
+==> where절 조건식에 자주 사용될 컬럼으로 
+	인덱스를 만들어 두면 검색시에 성능향상을 기대할 수 있어요.
+	그러나, 데이터변동이 빈번하고 데이터양이 적을때는 성능향상을 기대하기 어려워요
+
+1. << 인덱스의 생성 >>
+create index 인덱스명 on 테이블(컬럼)
+
+연습) book테이블의 bookname으로 인덱스 생성
+create index idx_book on book(bookname);
+
+select*from book where bookname like '%축구%'; --> 검색이 빨라지는가? 잘모르겠음
+
+연습) 새로운 도서를 추가해 봅시다
+insert into book values(23, '나혼자산다', '저기저기', 8500);
+
+1-1. << 인덱스의 재구성 >>
+alter index 인덱스이름 rebuild;
+alter index idx_book rebuild;
+===> 매번 index를 재구성해야하니
+	추가, 수정이 빈번한 경우에는 index가 오히려 번거로울 수 있다
+
+1-2. << 인덱스의 삭제 >>
+drop index 인덱스명;
+drop index idx_book;
+
+질문) 내가만든 인덱스가 잘 만들어 졌는지 확인해보고 싶어요
+	==> 오라클의 데이터사전(시스템뷰)를 통해 확인할 수 있어요
+
+	system view 종류
+		user_objects
+		user_tables
+		user_indexes
+		user_connstraints
+	
+	select object_name from user_objects;
+
+==> 테이블 생성시에 pk는 시스템이 자동으로 index를 생성 해준다
+
+
+pdf 126--------------------------------------------------------------------------------------------
+6번, 7번 해보기
+
+6) 뷰를 작성하세요
+1. 판매가격이 20,000원 이상인 도서의 도서번호, 도서이름, 고객이름, 출판사, 판매가격을
+보여주는 highorders뷰를 생성
+ -->	create view highorders as 
+	select b.bookid, bookname, name, publisher, saleprice from book b, orders o, customer c
+	where b.bookid=o.bookid and c.custid=o.custid and 
+	saleprice >= 10000 
+	order by bookid;
+
+
+2. 생성한 뷰를 이용하여 판매된 도서의 이름과 고객의 이름을 출력하는 sql문을 작성하시오
+ --> select bookname, name from highorders;
+
+
+3. highorders 뷰를 변경하고자 한다. 판매가격 속성을 삭제하는 명령을 수행하시오
+	삭제후 2.번 sql문을 다시 수행하시오
+ --> create or replace view highorders as 
+	select b.bookid, bookname, name, publisher from book b, orders o, customer c
+	where b.bookid=o.bookid and c.custid=o.custid and 
+	saleprice >= 10000 
+	order by bookid;
+or drop view highorders	==> 지우고 다시만들던지 replace해준다
+
+
+7) 사원데이터베이스로 sql문을 작성하시오.
+***1. 팀장(mgr)이 없는 직원의 이름을 보이시오
+--> select ename from emp where mgr is null;
+주의!!	==> null인것을 찾을때 = null안되요
+			      is null로 표현해야 한다
+	==> null이 아닌것을 찾으려면 is not null로 표현해요!
+
+
+2. 사원의 이름과 부서의 이름을 보이시오
+	(조인, 스칼라 부속질의 사용)
+조인 --> select ename, dname from emp e, dept d where d.dno=e.dno;
+서브쿼리 --> select ename, (select dname from dept d where d.dno=e.dno) dname from emp e;
+						--> 안에있는거랑 밖에있는거 조인해줘야함
+
+3. '서울'에 근무하는 사원의 이름을 보이시오
+	(조인, 인라인 뷰(from절 사용)/중첩질의(where절 사용)/esists사용)
+조인 --> select ename, dloc from emp e, dept d where d.dno=e.dno and dloc like '%서울%';
+중첩질의 --> select ename from emp where dno in (select dno from dept where dloc = '서울');
+exists --> select ename from emp e 
+	where exists (select dno from dept d where dloc = '서울' and e.dno=d.dno);
+
+4. 평균보다 급여가 많은 직원의 이름을 보이시오
+select avg(sal) from emp; --> 평균급여 1건
+select ename from emp where sal > (select avg(sal) from emp);
+
+
+*** 5. 자기부서의 평균보다 급여가 많은 직원의 이름을 보이시오
+	(상관부속질의 사용 --> where절의 서브쿼리와 main쿼리가 join되어야 한다)
+
+select dno, avg(sal) from emp group by dno; --> 부서별 평균급여 여러건
+
+select ename from emp where dno=100 and sal > (select avg(sal) from emp where dno=100); --> 100번부서평균중 높은급여를~
+
+
+select ename from emp e1
+	where sal > (select avg(sal) from emp e2 where e1.dno=e2.dno) 
+	order by dno;
+---------------------------------------------------------------------------------------------------
+
+0. << 데이터베이스 프로그래밍 >>
+데이터베이스 프로그래밍이란 DBMS에 데이터를 정의하고 저장된 데이터를 읽어와 
+데이터를 변경하는 프로그램을 작성하는과정
+데이터베이스 언어인 SQL을 포함한다
+
+1. PL/SQL
+	==> 별도의 자바, C/C++, 웹프로그래밍을 이용하지않고
+		오라클내에서 데이터베이스 프로그램을 만들 수 있어요
+	1) << 프로시저 >>
+		자바의 메소드처럼 SQL명령어를 미리 만들어두고 호출하여 사용할 수 있어요
+	형식-->	create or replace procedure 프로시저이름( 
+		매개변수 모드 자료형)
+		as 
+			지역변수(들)
+		begin 
+			프로시저가 해야할 명령어들(sql)
+		end;
+		/
+	연습) 도서번호, 도서명, 출판사, 가격을 매개변수로 전달받아
+		새로운 레코드를 book에 추가하는 프로시저를 만들어 봅시다
+	create or replace procedure insertBook(
+	bookid in number,
+	bookname in varchar2,
+	publisher in varchar2,
+	price in number)
+	as
+	begin
+	insert into book values(bookid, bookname, publisher, price);
+	end;
+	/
+-----------------------------------------------------------
+경고: 컴파일 오류와 함께 프로시저가 생성되었습니다.
+show errors	--> 명령으로 에러 확인후 다시 만들어요
+
+exec 이름()	--> 프로시저를 사용하겠다
+-----------------------------------------------------------
+1-1. 프로시저의 호출
+	exec 프로시저명(값1, 값2, ...)
+	exec insertBook(24,'재미있는자바','비트',30000);
+---> PL/SQL 처리가 정상적으로 완료되었습니다.
+
+연습) 도서번호와 가격을 매개변수로 전달받아 
+	해당도서의 가격을 수정하는 프로시저를 생성하고 사용해봅시다
+
+	create or replace procedure updateBook(
+	p_bookid in number,
+	p_price in number
+	)
+	as
+	begin
+	update book set price=p_price where bookid=p_bookid; 
+	end;
+	/
+	exec updateBook(9,11000);
+
+연습) 도서번호를 매개변수로 전달받아 해당도서를 삭제하는 프로시저를 생성하고 사용
+
+	create or replace procedure deleteBook(
+	p_bookid in number)
+	as
+	begin
+	delete book where bookid=p_bookid;
+	end;
+	/
+	exec deleteBook(24);
+----------------------------------------------->>
+SQL> exec deleteBook(8);
+BEGIN deleteBook(8); END;
+
+*
+1행에 오류:
+ORA-02292: 무결성 제약조건(C##MADANG.SYS_C007310)이 위배되었습니다- 자식
+레코드가 발견되었습니다
+ORA-06512: "C##MADANG.DELETEBOOK",  5행
+ORA-06512:  1행
+==> 8번책이 orders 테이블에 있기 때문에 삭제 할 수 없어요
+-------------------------------------------------
+day0123
+연습) 고객번호, 고객명, 주소, 전화번호를 매개변수로 전달받아
+	customer 테이블에 새로운 레코드를 추가하는
+	프로시저를 생성하고 사용해 봅니다
+	create or replace procedure insertCustomer(
+		p_custid in number,
+		p_name in varchar2,
+		p_address in varchar2,
+		p_phone in varchar2)
+	as
+	begin
+		insert into customer values(p_custid, p_name, p_address, p_phone);
+	end;
+	/
+	exec insertCustomer(9,'가나다','아프리카 콩고','010-9000-0001');
+
+========================================================================================================
+연습) 동일한 도서가 있는지 점검한 후 삽입하는 프로시저				(자바에서 실행해보자)
+	만약 매개변수로 전달받은 도서명과 동일한 도서가 있다면
+	해당도서의 가격을 수정하고
+	그렇지 않다면 도서를 추가하는 프로시저
+exec insertBook(11,'올림픽 이야기','심성당',12000);	--> 같은이름의 책이있으면 가격을 update해줘
+exec insertBook(11,'재미있는 자바','비트',20000);
+
+create or replace procedure BookInsertOrUpdate(
+	p_bookid in number,
+	p_bookname in varchar2,
+	p_publisher in varchar2,
+	p_price in number)
+as
+	cnt number;
+begin
+	select count(*) into cnt from book where bookname=p_bookname;
+	if cnt != 0 then
+		update book set price=p_price where bookname=p_bookname;
+	else
+		insert into book values(p_bookid, p_bookname, p_publisher, p_price);
+	end if;
+end;
+/
+
+exec BookInsertOrUpdate(9,'올림픽 이야기','심성당',8000);
+exec BookInsertOrUpdate(12,'재미있는 jsp','비트',32000);
+exec BookInsertOrUpdate(12,'재미있는 jsp','비트',52000);
+
+========================================================================================================
+연습) 동일한 도서번호가 있다면 도서명, 출판사, 가격을 변경			
+create or replace procedure BookInsertOrUpdate(
+	p_bookid in number,
+	p_bookname in varchar2,
+	p_publisher in varchar2,
+	p_price in number)
+as
+	cnt number;
+begin
+	select count(*) into cnt from book where bookid=p_bookid;
+	if cnt != 0 then
+		update book set booknamr=p_bookname, publisher=p_publisher, price=p_price 
+		where bookid=p_bookid;
+	else
+		insert into book values(p_bookid, p_bookname, p_publisher, p_price);
+	end if;
+end;
+/
+
+1-2. 값을 반환하는 프로시저
+연습) 도서의 평균가격을 반환하는 프로시저
+create or replace procedure AveragePrice(
+	p_avg out number)
+as
+begin
+	select avg(price) into p_avg from book;
+end;
+/
+===========================================================
+set serveroutput on;	--> dbms_output.put_line 하기위해
+===========================================================
+호출 ------------------------------------------>>
+declare
+r number;
+begin
+AveragePrice(r);
+dbms_output.put_line('책값평균'||r);
+end;
+/
+
+연습) 도서번호를 매개변수로 전달받아
+	해당도서의 도서명과 가격을 반환하는 프로시저를
+	정의하고 호출해 봅니다
+정의 ------------------------------------------>>
+create or replace procedure BooknameAndPrice(
+	p_bookid in number,
+	p_bookname out varchar2,
+	p_price out number)
+as
+begin
+	select bookname,price into p_bookname,p_price 
+	from book where bookid=p_bookid;
+end;
+/
+-------------------------------------------------
+
+
+호출 ------------------------------------------>>
+declare		
+p_bookname varchar2(20);	
+p_price number;			
+begin				
+BooknameAndPrice(5,p_bookname,p_price);		
+dbms_output.put_line('책이름: '||p_bookname);	
+dbms_output.put_line('가격: '||p_price);
+end;	
+/
+책이름: 피겨 교본
+가격: 8000
+
+PL/SQL 처리가 정상적으로 완료되었습니다.
+
+
+다른방법) 
+variable a varchar2(20)
+variable b number
+
+exec BooknameAndPrice(5,:a,:b)	// 책번호5번 책이름을 a에 담아줘, 가격을 b에 담아줘
+
+print a
+print b		// a,b를 출력해줘
+
+SQL> print a
+
+A
+-------------
+
+피겨 교본
+
+SQL> print b
+
+         B
+----------
+      8000
+
+-------------------------------------------------
+
+반환값이 있는 프로시저를 호출하기 위하여 다음과 같이
+	프로그래밍해요
+	반환값이 있으니 그 반환값을 출력해 보고 싶어요!
+	프로시저가 반환값을 변수 어딘가에 담아야 할 거에요
+
+declare		// 변수를 선언하겠습니다
+p_bookname varchar2(20);	// 프로시저가 책이름을 검색해서 담아줄 변수 선언
+p_price number;			// 프로시저가 책가격을 검색해서 담아줄 변수 선언
+begin				// plsql의 시작
+BooknameAndPrice(5,p_bookname,p_price);		
+// 프로시저호출(책번호가5인 도서의 책이름,가격을 p_bookname,p_price에 담아주세요) 
+dbms_output.put_line('책이름: '||p_bookname);	
+// 프로시저가 구해준 책 이름을 출력해요
+dbms_output.put_line('가격: '||p_price);
+// 프로시저가 구해준 가격을 출력해요
+end;	// 프로그램을 종료
+/
+
+---------------------------------------------------------------------------------------------------
+사원번호가 a번인 사람의 관리자 이름을 
+select m.ename into b from emp e, emp m where e.mgr=m.eno and e.eno=a; 
+--> sql을 먼저뽑은담에 변수처리해서 procedure를 만들자
+
+연습) 사원번호를 매개변수로 전달받아
+	해당직원의 관리자 이름을 
+	반환하는 프로시저를 만들고 호출해봅시다
+	
+create or replace procedure mgrName(
+p_eno in number,
+p_mname out varchar2)
+as
+begin
+	select m.ename into p_mname from emp e, emp m where e.mgr=m.eno and e.eno=p_eno;
+end;
+/
+
+declare
+b varchar2(20);
+begin
+mgrName(1022,b);
+dbms_output.put_line('관리자이름: '||b);
+end;
+/
+
+variable name varchar2(20);
+exec mgrName(1022,:name)
+print name
+---------------------------------------------------------------------------------------------------
+연습) 부서명을 매개변수로 전달받아 
+	해당 부서의 평균급여와 직원수를 반환하는 프로시저를
+	정의하고 호출해 봅니다
+
+select avg(sal), count(*) from emp e, dept d where e.dno=d.dno and dname='자바잡아';
+
+create or replace procedure AvgAndDnoCount(
+p_dname in varchar2,
+p_avg out number,
+cnt out number)
+as
+begin
+	select avg(sal),count(*) into p_avg,cnt from emp e, dept d where e.dno=d.dno and dname=p_dname;
+end;
+/
+
+declare
+p_dname varchar2(20);
+p_avg number;
+cnt number;
+begin
+AvgAndDnoCount('자바잡아',p_avg,cnt);
+dbms_output.put_line('평균급여: '||p_avg);
+dbms_output.put_line('직원수: '||cnt);
+end;
+/
+
+variable p_avg number; 
+variable cnt number;
+exec AvgAndDnoCount('자바잡아',:p_avg,:cnt)
+print p_avg
+print cnt
+
+---------------------------------------------------------------------------------------------------
+연습) 판매건수가 가장 많은 도서명과 출판사를 반환하는 프로시저를
+	정의하고 호출해 봅니다
+create or replace procedure BookTop1(
+p_bookname out varchar2,
+p_publisher out varchar2)
+as
+begin
+	select bookname,publisher into p_bookname,p_publisher from book
+	where bookid = (select bookid from (select bookid, count(*) from orders group by bookid order by count(*) desc)
+where rownum=1);
+end;
+/
+
+declare
+p_bookname varchar2(20);
+p_publisher varchar2(20);
+begin
+BookTop1(p_bookname,p_publisher);
+dbms_output.put_line('책이름: '||p_bookname);
+dbms_output.put_line('출판사: '||p_publisher);
+end;
+/
+
+variable p_bookname varchar2(20);
+variable p_publisher varchar2(20);
+exec BookTop1(:p_bookname, :p_publisher)
+print p_bookname;
+print p_publisher;
+
+
+판매건수가 가장많은 책번호
+select bookid, count(*) from orders group by bookid order by count(*) desc; 
+그 중에 1위
+select bookid from (select bookid, count(*) from orders group by bookid order by count(*) desc)
+where rownum = 1;
+
+---------------------------------------------------------------------------------------------------
+연습) 전화번호가 없는 고객의 수를 반환하는 프로시저를 정의하고 호출해 봅니다
+create or replace procedure NotNumber(
+cnt out number
+)
+as
+begin
+	select count(*) into cnt from customer where phone is null;
+end;
+/
+
+declare 
+cnt number;
+begin
+NotNumber(cnt);
+dbms_output.put_line('전화번호가 없는 고객 수 : '||cnt);
+end;
+/
+
+variable cnt number;
+exec NotNumber(:cnt);
+print cnt;
+---------------------------------------------------------------------------------------------------
+연습) 부서번호, 부서명, 부서위치를 매개변수로 전달받아
+	새로운 레코드를 추가하는 프로시저를 만들고
+	호출하는 자바프로그램을 만들고 실행해봅니다
+
+create or replace procedure insertDept(
+p_dno in number,
+p_dname in varchar2,
+p_dloc in varchar2)
+as
+begin
+	insert into dept values(p_dno,p_dname,p_dloc);
+end;
+/
+
+exec insertDept(900,'개발3팀','울산');
+
+
+
+
+
+2. 자바에서 DB연결 프로그램
+
+3. 웹에서 DB연결 프로그램
+
+-----------------------------------------------------------------------------------------
+day0128
+
+멀티행, 멀티컬럼 등 여러행을 처리할때 cursor를 생성, 테이블행을 순서대로 가리키는데사용
+					--> select 
+cursor 이름 is sql(select);
+open cursor이름 (sql실행);
+loop
+fetch corsor이름 into 변수,변수, ...;
+exit when %;
+if
+eles
+and loop
+close
+
+
+연습) 전체도서의 판매이익금을 게산하여 출력하는 프로시저를 생성
+	도서의 가격이 30000원이상이면 이익이 10%이고 그렇지않으면 5%가 이익금이다.
+
+set serveroutput on;
+
+create or replace procedure interest
+as
+	total numeric;
+	price numeric;
+	cursor c1 is select saleprice from orders;
+begin
+	total := 0;	--> total을 0으로 초기화 (:= 대입연산자)
+	open c1;	--> c1동작
+	loop
+		fetch c1 into price;
+		exit when c1%NOTFOUND;
+		if price >= 30000 then
+			total := total+price*0.1;
+		else
+			total := total+price*0.05;
+
+		end if;
+	end loop;
+	dbms_output.put_line('전체이익금: '||total);
+	close c1;
+
+end;
+/
+
+SQL> exec interest;
+전체이익금: 10880
+
+질문) 세미콜론(;)이 어디에는있고 어디에는 없는 기준
+	==> 자바와 같은 개념으로 생각해요.
+		문장 끝에 표시합니다
+
+
+연습) 출판사명을 매개변수로 전달받아
+	해당출판사의 모든 도서명과 가격을 출력하는 프로시저를 생성하고 결과확인
+create or replace procedure AllBook(
+	p_pub in varchar2)
+as
+	p_bookname varchar2(30);
+	p_price number;
+	cursor AllList is select bookname, price from book where publisher = p_pub;
+begin
+	p_price := 0;
+	open AllList;
+	loop	--> 반복문 for, while	
+		fetch AllList into p_bookname, p_price;
+		exit when AllList%NOTFOUND;
+		dbms_output.put_line(p_bookname || ': ' || p_price);
+	end loop;	
+	close AllList;
+end;
+/
+
+exec AllBook('대한미디어');
+
+dbms_output.put_line('책이름: '||p_bookname);
+dbms_output.put_line('가격: '||p_price);
+
+
+연습) 부서명을 매개변수로 전달받아
+	해당부서에 근무하는 모든 직원들의 
+	이름, 급여를 출력하고
+	평균급여를 출력하는 프로시저를 생성하고 호출해봅니다.
+create or replace procedure print_emp(
+	p_dname in varchar2)
+as
+	p_ename varchar2(30);
+	p_sal number;
+	p_avg number;
+	cursor c1 is select ename, sal from emp e, dept d where e.dno=d.dno and dname=p_dname; 
+	cursor c2 is select avg(sal) from emp e, dept d where e.dno=d.dno and dname=p_dname;
+begin
+	open c1;
+	open c2;
+	fetch c2 into p_avg;
+	loop 
+		fetch c1 into p_ename,p_sal;		
+		exit when c1%NOTFOUND;
+		dbms_output.put_line(p_ename || ' : ' || p_sal);		
+	end loop;	
+	dbms_output.put_line('평균: '||p_avg);
+	close c1;
+	close c2;
+	
+end;
+/
+
+exec print_emp('자바잡아');
+
+select ename, comm, avg(comm) from emp e, dept d where e.dno=d.dno and dname='자바잡아'; 
+select avg(comm) from emp e, dept d where e.dno=d.dno and dname='자바잡아';	
+평균을 나타내는 c2는 단일행이여서 loop를 안타도 됨
+cursor를 각각 만들어서 각각 열어주고 각각 닫아주면됨
+
+
+-----------------------------------------------------------------------------------------
+trigger ==> 데이터의 변경(insert, delete, update)문이 실행될때
+(마치 이벤트처리하는것과 같음)
+3가지 정보가 필요하다 
+	1. 대상(table)
+	2. sql
+	3. trigger시점
+
+====> 테이블의 내용이 변경될때
+	(insert, delete, update)자동으로 수행되는 프로지서를 말한다.
+
+실습을 위하여 book_log테이블을 생성합니다
+
+create table book_log as
+select*from book;
+
+
+연습) book테이블에 레코드가 추가되면 자동으로 동작하여
+	book_log에 추가된 행을 추가하는 트리거를 만들고
+	실험해 봅니다.
+
+create or replace trigger insert_book_log
+after insert on book for each row 
+declare
+	
+begin
+	insert into book_log values(:new.bookid, :new.bookname, :new.publisher, :new.price);
+end;
+/
+
+insert into book values(14, '재미있는 자바2','비트',13000);
+
+:new	--> insert가 일어난 후 행 자체, 
+	    update가 된 후의 행 자체
+:old	--> update가 되기 전 행 자체, 
+	    delete가 된 행 자체
+
+
+연습) book테이블에 레코드가 삭제되면 자동으로 동작하여
+	book_log에서 해당 도서를 삭제하는 트리거를 만들고 확인
+
+create or replace trigger delete_book_log
+after delete on book for each row
+declare
+begin
+	delete book_log where bookid = :old.bookid;
+end;
+/
+
+delete book where bookid=20;
+
+
+연습) book테이블에 리코드가 수정되면
+	자동으로 동작하여 book_log의 해당도서의 정보도 수정되도록 트리거를 생성하고
+	확인해봅시다.
+create or replace trigger update_book_log
+after update on book for each row
+declare
+begin
+	update book_log set bookname=:new.bookname,publisher=:new.publisher,price=:new.price where bookid=:new.bookid;
+	dbms_output.put_line('book_log의 정보도 수정되었습니다');
+end;
+/
+
+
+update book set bookname='재미있는 자바5', publisher='비트트',price=15000 where bookid=14;
+
+
+실습을 위해서 table생성
+create table 상품(
+	상품번호 number primary key,
+	상품명 varchar2(30),
+	단가 number,
+	재고수량 number
+);
+
+insert into 상품 values(1,'딸기',8000,0);
+insert into 상품 values(2,'복숭아',15000,0);
+insert into 상품 values(3,'포도',9000,0);
+
+
+create table 입고(
+	입고번호 number primary key,
+	상품번호 number references 상품(상품번호),
+	입고수량 number,
+	입고일 date
+);
+
+연습) 입고 테이블에 레코드가 추가되면 
+	입고수량만큼 해당 상품의 재고수량을 증가시는  
+	트리거를 생성하고 결과를 확인합니다.
+
+create or replace trigger trg_insert_입고
+after insert on 입고 for each row
+declare	
+begin	
+	update 상품 set 재고수량=:new.입고수량+재고수량 where 상품번호=:new.상품번호;
+end;
+/
+
+
+insert into 입고 values(1,1,10,sysdate);
+insert into 입고 values(2,1,100,sysdate);
+insert into 입고 values(3,3,50,sysdate);
+
+
+연습) '입고'테이블에 레코드가 삭제되면
+	해당 상품의 수량을 수정하는 트리거를 생성하고 결과를 확인해 봅니다
+
+create or replace trigger trg_delete_입고
+after delete on 입고 for each row
+declare
+begin
+	update 상품 set 재고수량=재고수량 - :old.입고수량 where 상품번호=:old.상품번호;
+end;
+/
+
+delete 입고 where 입고번호= 2;
+
+***
+연습) '입고'테이블에 레코드가 수정되면
+	해당 상품의 수정된 수량만큼
+	상품테이블의 재고수량에 반영하는 트리거를
+	생성하고 결과를 확인해 봅시다
+
+create or replace trigger trg_update_입고
+after update on 입고 for each row
+declare
+begin 
+	update 상품 set 재고수량=재고수량-(:old.입고수량-:new.입고수량) where 상품번호=:new.상품번호;
+
+end;
+/
+
+insert into 입고 values(1,1,10,sysdate);
+update 입고 set 입고수량=2 where 입고번호=1;
+
+insert into 입고 values(2,2,2,sysdate);
+update 입고 set 입고수량=8 where 입고번호=2;
+
+
+-----------------------------------------------------------------------------------------
+select avg(sal) from emp;
+위의 sql문장의 avg같은 함수를 만들고 싶어요
+
+사용자 정의 함수를 이용해요!
+
+
+연습) 도서금액을 매개변수로 전달받아 해당 도서의
+	판매이익금을 반환하는 함수를 만들고
+	호출해 봅니다.
+	(도서가격이 30,000원 이상이면 이익금이 10%, 
+	그렇지 않으면 이익금이 5%)
+create or replace function fnc_interest(
+	price number)
+return int
+is
+	myInterest number;
+begin
+	if price>=30000 then
+		myInterest := price*0.1;
+	else
+		myInterest := price*0.05;
+	end if;
+	return myInterest;
+	
+end;
+/
+select custid, orderid, saleprice, fnc_Interest(saleprice) interest from orders;
+
+
+pdf 172
+8.
+1) 고객의 주문 총액을 계산하여 40000원 이상이면 '우수'
+	40000원 미만이면 '보통'을 반환하는 함수 Grade()를 작성하시오.
+	Grade()를 호출하여 고객의 이름과 등급을 보이는 sql문도 작성하시오
+select sum(saleprice) from orders;
+
+create or replace function Grade(
+saleprice number)
+return string
+is
+	Grade varchar2(20);
+begin
+	if saleprice >= 40000 then
+		Grade := '우수';
+	else 
+		Grade := '보통';
+	end if;
+	return Grade;
+end;
+/
+select c.custid, Grade(sum(saleprice)) 등급 
+from orders o, customer c where c.custid=o.custid group by c.custid;
+
+select custid, sum(saleprice) from orders group by custid;
+=========================================================================================
+
+create or replace function Grade(
+	p_custid number)
+return varchar2
+is
+	r varchar2(30);
+	total number;
+begin
+	select sum(saleprice) into total from orders where custid=p_custid;
+	if total >= 30000 then
+		r := '우수';
+	else
+		r := '보통';
+	end if;
+	return r;
+end;
+/
+
+select custid, name, Grade(custid) 등급 from customer;
+
+
+2) 고객의 주소를 이용하여 국내에 거주하면 '국내거주', 해외에 거주하면 '국외거주'
+	를 번환하는 함수 Domestic()을 작성하시오. Domestic()을 호출하여
+	고객의 이름과 국내/국외 거주여부를 출력하는 sql문도 작성하시오
+
+create or replace function Domestic(
+addr varchar2)
+return varchar2
+is
+	r varchar2(20);
+begin
+	r := '국외거주';
+	if addr like '%대한민국%' then
+		r := '국내거주';
+	end if;
+	return r;
+end;
+/
+
+select name, Domestic(address) 거주여부 from customer;
+
+3) 2)번에서 작성한 Domestic()을 호출하여 국내거주 고객의 판매 총액과 국외거주 고객의 
+	판매총액을 출력하는 sql문을 작성하시오.
+select name, Grade(custid) 등급, Domestic(address) 거주여부 from customer;
+
+select name, (select nvl(sum(saleprice),0) from orders o where c.custid=o.custid) total, 
+Domestic(address) 거주여부 from customer c;
+
+---------------------------------------------------------------------------------------------------
+Domestic()을 호출하여 국내거주, 국외거주지 별 고객의 총 판매액을 출력
+--> select Domestic(address),sum(saleprice) from customer c, orders o
+where c.custid=o.custid group by Domestic(address);
+
+
+pdf 173
+9-3 출판사별로 도서의 평균가보다 비싼 도서의 이름을 보이는 프로그램을 작성하시오
+	(예를들어 A출판사 도서의 평균가가 20000원이라면 A출판사 도서 중 20000원 이상인
+		도서를 보이면 된다)
+
+select publisher, avg(price) 
+from book  
+group by publisher;		--> 출판사별 평균
+
+ 
+
+select bookname, avg(price)
+from book  
+where price >  (select publisher, avg(price) 
+from book  
+group by publisher);	--> group by 는 from 절에 들어가함
+
+
+출판사별로--> 
+select bookname
+from book b1 
+where price > (select avg(price) from book b2 where b1.publisher=b2.publisher);
+
+
+day0131
+==================================<< 오류 >> ==================================
+ORA-04091: C##MADANG.OPTIONS 테이블이 변경되어 트리거/함수가 볼 수 없습니다.
+ORA-06512: "C##MADANG.TD_OPTIONTYPES",  9행
+ORA-04088: 트리거 'C##MADANG.TD_OPTIONTYPES'의 수행시 오류
+=====> trigger비활성화를 해주자
+	----> delete optiontypes where option_no=4;	
+
+	트리거를 확인하는 방법 과 활성화 및 비활성화 하는 쿼리 입니다.
+	--트리거 확인
+	SELECT
+	  owner,
+	  trigger_name,
+	  status
+	FROM
+	  dba_triggers;
+	 
+	--트리거 비활성화
+	ALTER TRIGGER 트리거명 DISABLE;
+	 
+	--트리거 활성화
+	ALTER TRIGGER 트리거명 ENABLE;
+===============================================================================
+
+lombok
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+
+ALTER TRIGGER TI_OPTIONS DISABLE;
+
+
+insert into member values('lee','이수인','010-1111-1111');
+insert into member values('hong','홍수지','010-2222-2222');
+
+
+<< 파일의 업로드 >>======================================================================
+자동차 등록시에 자동차 정보 뿐 아니라 자동차 사진도 업로드 하고 싶어요
+파일을 업로드 하려면 다음을 따라 해요
+0.	cos.jar이 필요함
+1.	<from action="insertCarOk.jsp" method="post" enctype="multipart/form-data">
+2.	insertCarOk.jsp에서는
+	request.setCharicterEncoding("euc-kr");	--> 한글사용하려면 무조건
+		사진도 서버에 하드디스크에 복사하고
+		입력한 내용도 받아오기 위해서는 cos.jar에 있는 MultipartRequest를 이용합니다.
+		여러가지 생성자가 있는데 그 그중에 매개변수 2개를 받는 
+		다음의 생성자를 이용합니다.
+	MultipartRequest multi = new MultipartRequest(request, path);	path: 저장할 경로
+	==> 이 객체 생성시에 이미 파일은 path에 복사됩니다.
+	또, 사용자가 입력한 나머지 정보들은
+	multi를 통해서 받아옵니다
+
+	request.getParameter("파라메터이름");	--> 으로는 못받아옴
+	multi.getParameter("파라메터이름")
+
+day0203
+c:/rentCar라는 폴더를 맏르고 거기에 사진을 업로드 하였습니다
+만약 파일을 서버에 저장하기만을 목적으로 한다면 이렇게 해도 됩니다
+
+그러나 우리는 이 사진파일을 브라우저에 출력을 하려고 해요
+그렇게 하기 위해서는 사진이 있는 경로 c:/rentCar/k5/jpg라고 표현해야 할텐데
+우리의 웹서버는 전세계를 대상하여 서비스를 할텐데 
+모든사용자의 하드디스크에 c:/rentCar라는 폴더는 없어요!
+rentCar라는 폴더는 서버에만 있는것이 아니다
+그래서 사용자에게 서비스할 이미지라면 서버의 하드디스크에 c:/를 직접 저장해서는 곤란해요
+
+현재 웹어플리케이션을 기준으로 폴더를 만들고 거기에 저장해야 합니다.
+
+=====>	기본적인 html
+	jsp
+	스프링/mybatis
+	javaScript/Ajax/Squery
+
+
+질문) 어떨때 html로 만들고 어떨때 jsp로 만들까요?
+	--> 문서외에 이미지나 또다른 형태의 정보를 웹에서 나타내고 싶을때 jsp를사용한다?
+	==> jsp = html + java 
+		
+	(jsp 는 자바프로그램에 의해서 사용자의 배경, 상태에 따라 다른 정보를 뿌려준다(동적)
+	html 은 누구라도 똑같은 정보를 뿌려준다(정적)(
+
+======> 모든 사용자에게 언제라도 동일한 내용을 서비스 해요
+	(정적인 html을 서비스 할때는 html파일로도 충분하다)
+	그러나,
+	사용자 마다, 상용자의 상황에 따라 매번 다른 html을 서비스해요
+	(동적인 html을 서비스 해야할 때는 프로그램에 의해서 html을 생성해야하요
+	그때 jsp를 이용합니다) ===> 웹프로그래밍언어 = jsp
+
+<< 웹 프로그래밍 언어 >>	일반적인 db
+	jsp	java기반	oracle
+	asp	c#기반		mssql
+	php			mysql		==>소규모 프로젝트에 적합
+	... 등이있다
+
+
+=========================================================================================
+<< html(hyper text markup language) >>
+==> 인터넷상에서 보여지는 문서의 형태
+
+사용자가 서비스를 요청하는 방식
+1) get		<--- 기본적으로는 get방식입니다.
+		get방식에서 사용자의 입력값은 주소표시줄에 노출됩니다.
+		insertMemberOk.jsp?id=tiger&pwd=1234&name=%C8%~~~~~~
+					=====> 쿼리스트링
+					=====> 쿼리스트링에는 공백이 없어야 합니다
+2) post		<--- 
+
+
+<< 웹 어플리케이션의 동작 방식 >>
+
+
+사용자	-------("회원가입하고 싶어요" 서비스를 요청(request))------->	네이버
+			사용자가 어떤 서비스를 원하는지
+			또, 사용자가 요청한 모든정보를 갖고있는 jsp내장 객체
+			====> "request"입니다.
+
+
+create table member(
+	id varchar2(20) primary key,
+	pwd varchar2(20),
+	name varchar2(20),
+	tel varchar2(20),
+	birth varchar2(20),
+	email varchar2(30),
+	gender varchar2(15),
+	bl_type varchar2(15),
+	hobbys varchar2(100),
+	url varchar2(30),
+	job varchar2(20),
+	intro varchar2(100)); 
+
+create table member(
+	id varchar2(20) primary key,
+	pwd varchar2(20),
+	name varchar2(20),
+	tel varchar2(20),
+	birth date,
+	email varchar2(30),
+	gender varchar2(15),
+	bl_type varchar2(15),
+	hobbys varchar2(100),
+	url varchar2(30),
+	job varchar2(20),
+	intro varchar2(100)); 
+
+
+vo	==> table	to_date	함수 이용
+table	==> vo		to_char	함수 이용
+
+to_date('2020/02/03', 'yyyy/mm/dd');	문자열 => 날짜
+to_char(sysdate, 'yyyy/mm/dd');		날짜 => 문자열
+
+
+day0204
+** 축구 쇼핑몰을 만들려고 합니다 **
+1. 상품을 등록하기위한 테이블 goods를 만들자
+	상품(상품번호*, 상품명, 단가, 수량, 상품사진, 상세설명)
+create table goods (
+	no number primary key,
+	item varchar2(30),
+	price number,
+	qty number,
+	fname varchar2(100),
+	detail varchar2(100));
+2. 상품등록을 위한 Vo, Dao, html과 jsp를 각각 만들어봅시다
+	(단, 상품사진을 업로드 가능한 사람은 처리하고 
+	그렇지 않은 사람은 문자열로 입력받아서 처리해 봅시다)
+
+
+
+<< jsp >>
+Java Server Page
+==> 자바언어로 서버의 문서를 만들기 위한 기술
+	자바언어로 웹문서(html)를 만들기 위한 기술
+
+==> jsp이전에 원래는 자바언어로 웹서버의 문서를 만드는 기술이
+	'서블릿'이라는 것이 있었습니다.
+	'서블릿'으로 웹문서를 만드는 방법은 번거롭고 어려워서
+	보다 쉽게 웹문서를 만들기 위하여 jsp를 나중에 발표했음
+
+jsp 초기에는 동적인 html만들기가 서블릿에 비하여 쉬워서 인기가 있었으나
+시간이 지남에 따라 프로젝트의 규모가 커지고 사용자의 요구가 복잡해지고
+사용자는 빈번한 수정을 요구합니다.
+이런경우 하나의 jsp에 
+	사용자의 요청, 요청을 처리하기위한 java문법, 결과를 보여주기 위한 thml이
+	섞여있어서 협업, 유지보수하기에 어려움이 있다.
+
+	===> 많은 개발자들이 협업이나 유지보수에 유용한 자신만의 개발 패턴을 만듭니다
+		MVC패턴
+		M : Model		일처리를 위한 자바클래스들
+		V : View		사용자 화면에 보여줄 html
+		C : Controller		사용자자 어떤 서비시를 원하는지 파악
+
+		이때, 이 controller의 역할을 
+			일반적으로 서블릿이 담당하게됩니다.
+		그래서 현재는 서블릿이 중요해 졌습니다.
+
+연습) 웹브라우저에 "hello"라고 출력하는 
+	"서블릿"과 "jsp"를 각각 만들어 봅시다.
+
+** jsp를 만들때 서블릿을 만들어준다
+그 경로는-->
+C:\jspTest\.metadata\.plugins\org.eclipse.wst.server.core\tmp0\work\Catalina\localhost\day0204\org\apache\jsp
+==> jsp의 내용변경이 많아서 반영이 안될때가 간혹 있는데 
+	그때는 서블릿을 다 지워주자
+	그리고 다시 jsp를 실행시키면 다시 새 서블릿을 만들어줌
+
+
+*************************** << jsp 구성요소 >> ********************************
+1. 지시자	<%@ page	%>
+		<%@ include	%>
+		<%@ taglib	%> --> 다음에 이야기 합시다
+	- page		: jsp문서를 실행하기전에 선행처리 되어야 할 내용을 설정
+	- include	: 다른 jsp의 내용을 현재문서에 포함시키는 기능
+	- taglib	: 자바문법을 대신하는 태그를 설정하는 기능
+
+2. 스크립트 릿--<%	%>
+	- 온갖종류의 (선택문, 반복문, 변수처리등)자바문법을 사용하기 위한 기능
+
+3. 표현식-------<%=	%>
+	- 변수나 메소드 호출(반환값이 있는) 결과를 출력하기위해 사용하는 기능
+
+4. 선언문-------<%!	%>
+	- 생성되는 서블릿의 멤버변수, 멤버메소드를 정의하기 위한 기능
+
+5. 액션태그-----<
+	- 태그모양인데 어떤 동작을 해요.
+	<jsp:uesBean>		: 웹 프로그래밍에서 bean이라는 표현은 자바객체를 bean이라고 표현해요.
+					==> 자바객체를 생성하는 태그
+					    예) BoardVo객체를 생성하기위한 자바문법은
+					    	BoardVo b = new BoardVo();
+						=> <jsp:useBean name="b" class="com.bit.vo.BoardVo">
+	<jsp:setProperty>	: jsp액션태그 <jsp:uesBean>에 의해 생성된 객체의 속성에 값을 설정하기 위하여 사용하는 액션태그
+				예) BoradVo의 객체참조변수 b의 title을 "안녕" 으로 하려면
+					b.setTitle("안녕");
+						=><jsp:setProperty id="b" property="title" value="안녕">
+					<jsp:setProperty>는 사용자의 입력값을 한꺼번에 vo에 담아올때 유용하게 사용할 수 있어요.
+						=><jsp:useBean name="m" class="com.bit.vo.Member">
+						  <jsp:setProperty id="m" property="*">
+						  ===> 이것을 위해서는 vo의 속성명과 html태그의 이름이 일치해야합니다.
+
+
+	<jsp:getProperty>	: vo의 특정속성값을 읽어오기 위하여 사용합니다
+				
+	
+	<jsp:include>		: 다른 jsp를 포함시켜요!
+	<jdp:forword>		: 다른 jsp로 이동시켜요!
+	<jsp:param>		: <jsp:include>나
+				  <jsp:forward>의 자식노드로 쓰입니다.
+				  포함되는 문서나, 이동되는 문서에 전달값이 필요할때 사용하는 태그입니다.
+				  (=쿼리스트링처럼)
+
+*******************************************************************************
+
+지시자 include와 
+액션태그 include는 무슨차이가 있어요??
+
+둘다 다른 jsp를 포함시키는것은 동일해요
+--> 지시자 include는 문서의 내용을 포함된 jsp에 별도의 서블릿이 생성되지 않아요
+    그러나 액션태그 include는 포함된 jsp의 실행결과를 포함시켜요.
+       포함된 jsp의 별도의 서블릿이 생성되어요.
+ 
+---------------------------------------------------------------------------------------------------
+사용자의 상태에 따라 다른 문서로 이동시키 위하여 
+response.sendRedirect()
+<jsp:forward>를 사용할 수 있어요!
+--> response.sendRedirect()는 이동된 문서가 주소표시줄에 노출되어요
+    그러나 <jsp:forward>는 이동된 문서가 주소표시줄에 노출되지 않아요. 보안유지상 <jsp:forward>가 더 효율적일 수도 있어요.
+
+---------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+(( 오라클에 문자열은 ''로 묶어서 표현하는데
+데이터에 '를 표현할 수는 없어요.
+db에 들어갈때는 '를 다른문자로 치환하여 넣어요.
+그리고 다시 표현할 때는 다시 '로 치환하여 출력해요.))
+
+
+day0206
+게시물 번호는 1부터 1씩 증가하는 "시퀀스"를 이용합시다.
+0.<< 시퀀스만드는 방법 >>
+---> create sequence 시퀀스이름 start with 100 increment by 10;
+start with와  step을 생략하면 1부터 1씩 증가한 값이 부여 됩니다.
+
+---> create sequence seq_board;
+
+1.<< 시퀀스의 적용 >>
+	--> 다음번호 생성
+시퀀스명.currval	--> 현재번호 확인
+
+
+질문) 글목록을 출력했더니 글번호가 순서대로 나오지 않아요.
+글번호		글제목		작성자
+24		안녕		홍길동
+23		목요일입니다.	이순신
+3		내일은금요일	김찬휘
+==> 예, 맞습니다. 글번호를 시퀀스를 이용하였으므로
+	시퀀스에 의해서 글번호를 알아서 설정하였기 때문에
+	글 등록을 하기전에
+	시퀀스명.nextval를 여러차례 적용하였다면
+	순서대로 되지 않을 수 있으니
+	신경쓰지 않아도 되어요.
+
+	insert하는 오류가 20번 났어요
+	그러면 그동안에 시퀀스명.nextval을 20번 콜 한것입니다.
+
+	그 다음에 23째만에 insert를 성공했다면
+	번호가 23이 들어갑니다.
+	이것을 원하지 않는다면 max함수를 이용하여 글번호로 사용해!
+
+질문) 게시물 등록시에 파일이 없는 게시물을 등록하고 
+	상세보기할때 문제가 발생했어요
+
+수정하기 test
+1. 원래 파일이 있는 게시물을 파일도 수정해봐요.
+2. 원래 파일이 있는 게시물을 파일은 수정하지 않고 다른 내용만 수정해봐요.
+3. 원래 파일이 있는 게시물에 파일은 없애고 다른내용 수정하고싶어요.
+4. 원래 파일이 없는 게시물을 파일도 수정해봐요.
+5. 원래 파일이 없는 게시물을 파일은 수정하지 않고 다른 내용만 수정해봐요.
+
+만약 수정에 실패하였다면, 업로드 한 파일을 삭제합니다.
+
+<< member에 로그인한 사람이 게시판에 글을 올리게 하자 >>
+
+
+day0207
+<< session >>
+jsp내장객체 중 하나이며 상태유지를 위하여 사용합니다.
+예를들어 로그인을 했는지 안했는지, 또 투표를 했는지 안했는지... 등
+사용자의 어떠한 상태를 유지할 필요가 있을때 사용한다.
+
+sesstion에 값을 설정하기위해서
+session.setAttribute(속성명,값);
+속성명에는 String,
+
+값에는 무엇이든지 올 수 있어요.
+세션에 설정된 값을 읽어오기위해서는 
+Object obj = session.getAttribute(속성명);
+
+세션에는 무엇이던지 담을 수 있기 때문에 getAtturibute는 Object를 반환하도록 설정되어있어요.
+따라서 원하는 자료형으로 형변환후 사용합니다.
+
+
+연습) 게시물 등록시 등록한 사람의 ip주소를 데이터베이스에 저장하고 싶어요.
+request.getRemoteAddr()메소드를 이용합니다.
+
+연습) 상품목록, 상품상세, 상품수정, 상품삭제에 대한 기능을 차례대로 구현합니다.
+
+create sequence seq2_goods start with 1001 increment by 1;
+
+
+day0210
+질문) 어떨때 doGet을 써야할지, 어떨때 doPost를 써야하는가요?
+=====>	get방식으로 요청할때는 doGet을 사용
+	post방식으로 요청할때는 doPost를 사용
+
+=====>	어떨때가 get방식이고 어떨때가 post방식인가요?
+	<form action="" method="post"></form> --> post 방식
+	나머지는 모두 get방식입니다.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
