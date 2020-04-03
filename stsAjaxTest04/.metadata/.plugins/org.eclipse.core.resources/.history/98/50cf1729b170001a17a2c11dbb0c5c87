@@ -1,0 +1,54 @@
+package com.example.demo.advice;
+
+import java.io.FileWriter;
+import java.util.Date;
+
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.stereotype.Component;
+
+@Aspect
+@Component
+public class BitShopAdvice {
+	
+	@Pointcut("execution(public * com.example.demo.comtroller..*(..))")	
+	public void bsmethod() {}
+	
+	@Before("bsmethod()")
+	public void before(JoinPoint joinPoint) {
+	/*
+	 * 사용자의 모든요청을 수행하기전에 
+	 * before어드바이스를 적용하여
+	 * 요청명, 요청날짜, ip주소를 파일로 기록하도록 합니다.	
+	 */
+		//System.out.println("컨트롤러 동작하기 전입니다.");
+		String methodName = joinPoint.getSignature().toShortString();
+		//System.out.println("요청명: "+methodName);
+		
+		Date today = new Date();
+		int yaer = today.getYear()+1900;	//년	
+		int mon = today.getMonth()+1;		//월
+		int day = today.getDate();			//일
+		
+		String ipaddr = null;
+		//System.out.println("사용자 ip: "+ipaddr);
+		
+		String str = "";
+		str += "요청명: "+methodName;
+		str += "요청날짜: "+yaer+"년,"+mon+"월,"+day+"일";
+		str += "요청IP:" +ipaddr;
+		
+		try{
+			FileWriter fw = new FileWriter("C:\\stsAjaxTest04\\record.txt");
+			fw.write(str);
+			fw.close();
+		}catch (Exception e) {
+			// TODO: handle exception
+			System.out.println(e.getMessage());
+		}
+		
+		
+	}
+}

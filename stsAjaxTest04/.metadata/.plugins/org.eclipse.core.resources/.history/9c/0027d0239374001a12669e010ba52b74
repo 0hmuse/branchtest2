@@ -1,0 +1,32 @@
+package com.example.demo.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.demo.dao.MemberDao;
+import com.example.demo.vo.MemberVo;
+
+@RestController
+public class MemberController {
+
+	@Autowired
+	private MemberDao dao;
+	public MemberDao getDao() {
+		return dao;
+	}
+	
+	@RequestMapping("/insertMember")
+	public String inertMember(MemberVo m) {
+		String str = "회원가입 실패!";
+		String n_pwd = PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(m.getPwd());		
+		m.setPwd(n_pwd);
+		int re = dao.inertMember(m);
+		if(re > 0) {
+			str = "회원가입 성공!";
+		}
+		return str;
+	}
+}

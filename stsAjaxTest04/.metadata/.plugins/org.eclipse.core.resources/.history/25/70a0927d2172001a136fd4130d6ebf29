@@ -1,0 +1,14 @@
+package com.example.demo.compoent;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.stereotype.Component;
+
+@Component
+public class SmtpCompoent {
+
+	@Bean
+	public JavaMailSenderImpl javaMailSenderImpl() {
+		
+	}
+}

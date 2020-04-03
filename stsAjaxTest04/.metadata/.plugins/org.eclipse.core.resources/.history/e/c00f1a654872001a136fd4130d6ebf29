@@ -1,0 +1,23 @@
+package com.example.demo.db;
+
+import java.io.Reader;
+
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+
+public class EmpManager {
+
+	private static SqlSessionFactory factory;
+	static {
+		try{
+			Reader reader = Resouces
+					factory = new SqlSessionFactoryBuilder().build(reader);
+		}catch (Exception e) {
+			// TODO: handle exception
+			System.out.println(e.getMessage());
+		}
+		
+		
+	}
+}

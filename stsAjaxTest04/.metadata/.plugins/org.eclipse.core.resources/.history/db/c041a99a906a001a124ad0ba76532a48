@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="EUC-KR">
+<title>Insert title here</title>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script type="text/javascript">
+$(function(){
+	
+	var arr;
+	$.ajax("listPark",{success:function(data){
+		//alert(data);
+		$.each(arr,function(idx,location){
+			var park = $("<li></li>").find("P_PARK");
+		});
+	}});
+	
+});
+</script>
+</head>
+<body>
+	<ul id="list"></ul>
+</body>
+</html>

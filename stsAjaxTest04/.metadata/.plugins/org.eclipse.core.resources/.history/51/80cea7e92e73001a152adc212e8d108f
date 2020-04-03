@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style type="text/css">
+	#insertDiv{
+		display: none;
+	}
+	
+	.active{
+		background: pink;
+	}
+</style>
+<script type="text/javascript" src="//code.jquery.com/jquery-3.4.1.min.js"></script>
+<script type="text/javascript">
+$(function(){
+	
+	var arr;
+	
+	$("#btnInsert").click(function(){
+		$("#insertDiv").css("display","block");
+		$(".btnDiv").css("display","none");
+		
+		$("#btnInsertOk").click(function(){
+			var insertData = $("#insertForm").serialize();
+			
+			$.ajax("/insertEmp", {data:insertData, success: function(data){
+				alert(data);
+			}})
+			
+		})
+		$("#btnInsertReset").click(function(){
+			$("#insertForm input").val("");
+		})
+		
+	})
+	$("#btnDelete").click(function() {
+		var EmpData = $("#f").serialize();
+		$.ajax("/deleteEmp", {data : EmpData, success : function(r) {
+			
+			
+			} 
+		});
+
+	});
+	
+	$("#btnUpdate").click(function() {
+		var EmpData = $("#insertForm").serialize();
+		$.ajax("/updateEmp", {data : EmpData, success : function(r) {
+			alert("���������듬����.")
+			
+			} 
+		});
+
+	});		
+	
+	
+	
+	$.getJSON("listEmp.do",function(data){
+        arr = data;
+       // alert(arr);
+        $.each(arr, function(idx, e){ 
+        	 var tr = $("<tr></tr>"); 
+             var td1 = $("<td></td>").html( e.eno ); 
+             var td2 = $("<td></td>").html( e.ename );
+             var td3 = $("<td></td>").html( e.job );
+             var td4 = $("<td></td>").html( e.sal );
+             var td5 = $("<td></td>").html( e.comm );
+             var td6 = $("<td></td>").html( e.mgr );
+             var td7 = $("<td></td>").html( e.hiredate );
+             var td8 = $("<td></td>").html( e.dno );
+             var td9 = $("<td></td>").html( e.email );
+             var td10 = $("<td></td>").html( e.jumin );
+             $(tr).append(td1,td2,td3,td4,td5,td6,td7,td8,td9,td10);
+            
+            $(tr).attr("idx", idx);
+            $(tr).click(function(){
+            	$("tr").removeClass("active");
+            	$(this).addClass("active");
+            	var idx = $(this).attr("idx");
+            	$("#eno").val(arr[idx].eno);
+            	$("#ename").val(arr[idx].ename);
+            	$("#job").val(arr[idx].job);
+            	$("#sal").val(arr[idx].sal);
+            	$("#comm").val(arr[idx].comm);
+            	$("#mgr").val(arr[idx].mgr);
+            	$("#hiredate-hidden").val(arr[idx].hiredate-hidden);
+            	$("#dno").val(arr[idx].dno);
+            	$("#email").val(arr[idx].email);
+            	$("#jumin").val(arr[idx].jumin);
+            	
+            });
+            
+            $(tr).append(td1,td2); 
+          
+            $("#tb").append(tr); 
+        });        
+    });	
+	
+	
+	
+});
+</script>
+</head>
+<body>
+	<div id="insertDiv"> 
+		<form id="insertForm">
+			<table>
+				<tr>
+					<td>�ъ��踰���</td>
+					<td><input type="number" name="eno" id="eno"></td>
+				</tr>
+				<tr>
+					<td>�ъ���대�</td>
+					<td><input type="text" name="ename" id="ename"></td>
+				</tr>
+				<tr>
+					<td>吏�湲�</td>
+					<td><input type="text" name="job" id="job"></td>
+				</tr>
+				<tr>
+					<td>湲���</td>
+					<td><input type="number" name="sal" id="sal"></td>
+				</tr>
+				<tr>
+					<td>����</td>
+					<td><input type="number" name="comm" id="comm"></td>
+				</tr>
+				<tr>
+					<td>愿�由ъ��</td>
+					<td><input type="text" name="mgr" id="mgr"></td>
+				</tr>
+				<tr>
+					<td>怨��⑹��</td>
+					<td><input type="date" name="hiredate" id="hiredate"></td>
+					<td><input type="hidden" name="hiredate" id="hiredate-hidden"></td>
+				</tr>
+				<tr>
+					<td>遺���</td>
+					<td><input type="number" name="dno" id="dno"></td>
+				</tr>
+				<tr>
+					<td>�대���</td>
+					<td><input type="text" name="email" id="email"></td>
+				</tr>
+				<tr>
+					<td>二쇰�쇰�깅�踰���</td>
+					<td><input type="text" name="jumin" id="jumin"></td>
+				</tr>
+			</table>
+		</form>
+		<button id="btnInsertOk">�깅�</button>
+		<button id="btnInsertReset">痍⑥��</button>
+		<button id="btnUpdate">����</button>
+		<button id="btnDelete">����</button>
+	</div>
+	<div class="btnDiv">
+		<button id="btnInsert">�ъ���깅�</button>
+	</div> 
+	<div id="listDiv">
+		<table id="tb" border="1">
+			<tr>
+				<th>�ъ��踰���</th>
+				<th>�ъ���대�</th>
+			</tr>
+		</table>
+	</div>
+
+</body>
+</html>

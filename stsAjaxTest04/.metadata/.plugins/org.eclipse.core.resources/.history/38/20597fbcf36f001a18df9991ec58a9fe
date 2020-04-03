@@ -1,0 +1,173 @@
+package com.example.demo.db;
+
+import java.io.Reader;
+import java.util.List;
+
+import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+
+import com.example.demo.vo.BookVo;
+import com.example.demo.vo.CartVo;
+import com.example.demo.vo.ChatVo;
+import com.example.demo.vo.EventVo;
+import com.example.demo.vo.GoodsVo;
+import com.example.demo.vo.MemberVo;
+
+public class GoodsManager {
+
+	private static SqlSessionFactory factory;
+	static {
+		try {
+			Reader reader = Resources.getResourceAsReader("com/example/demo/db/sqlMapConpig.xml");
+			factory = new SqlSessionFactoryBuilder().build(reader);
+			reader.close();
+		}catch (Exception e) {
+			// TODO: handle exception
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	public static int insertChat(ChatVo c) {
+		int re = -1;
+		SqlSession session = factory.openSession();
+		re = session.insert("chat.insert",c);
+		session.commit();
+		session.close();
+		return re;
+	}
+	
+	
+	public static List<ChatVo> listChat(){		 
+		SqlSession session = factory.openSession();
+		List<ChatVo> list = session.selectList("chat.selectAll");
+		session.close();
+		return list;
+	}		
+	
+	
+	public static List<EventVo> listAllEvent(){		 
+		SqlSession session = factory.openSession();
+		List<EventVo> list = session.selectList("event.selectAll");
+		session.close();
+		return list;
+	}
+	
+	public static int insertEvent(EventVo e) {
+		int re = -1;
+		SqlSession session = factory.openSession();
+		re = session.insert("event.insert",e);
+		session.commit();
+		session.close();
+		return re;
+	}
+	
+	
+	public static int insertCart(CartVo cv) {
+		int re = -1;
+		SqlSession session = factory.openSession();
+		re = session.insert("cart.insert", cv);
+		session.commit();
+		session.close();
+		return re;
+	}
+	
+	public static MemberVo login(MemberVo m){
+		MemberVo mv = null;
+		SqlSession session = factory.openSession();		
+		mv = session.selectOne("member.login", m);
+		session.close();
+		return mv;
+		
+	}
+	
+	
+	
+	//Book
+	public static List<BookVo> listBook(){		 
+		SqlSession session = factory.openSession();
+		List<BookVo> list = session.selectList("book.selectAll");
+		session.close();
+		return list;
+	}
+	
+	public static int totalRecord() {
+		int re = -1;
+		SqlSession session = factory.openSession();
+		re = session.selectOne("book.totalRecord");
+		
+		session.close();
+		return re;
+	}
+	
+	public static int insert(BookVo b) {
+		int re = -1;
+		SqlSession session = factory.openSession();
+		session.insert("book.insert", b);
+		session.commit();
+		session.close();
+		return re;
+	}
+	
+	public static int update(BookVo b) {
+		int re = -1;
+		SqlSession session = factory.openSession();
+		session.update("book.update", b);
+		session.commit();
+		session.close();
+		return re;
+	}
+	
+	public static int delete(BookVo b) {
+		int re = -1;
+		SqlSession session = factory.openSession();
+		session.delete("book.delete", b);
+		session.commit();
+		session.close();
+		return re;
+	}
+	
+	
+	//goods
+	public static GoodsVo getGoods(GoodsVo g) {
+		SqlSession session = factory.openSession();
+		GoodsVo g = session.selectOne("goods.selectAll", g);
+		session.close();
+		return list;
+	}
+	
+	public static List<GoodsVo> listAll(){		 
+		SqlSession session = factory.openSession();
+		List<GoodsVo> list = session.selectList("goods.selectAll");
+		session.close();
+		return list;
+	}
+	
+	public static int insertGoods(GoodsVo g) {
+		int re = -1;
+		SqlSession session = factory.openSession();
+		session.insert("goods.insert", g);
+		session.commit();
+		session.close();
+		return re;
+	}
+	
+	public static int updateGoods(GoodsVo g) {
+		int re = -1;
+		SqlSession session = factory.openSession();
+		session.update("goods.update", g);
+		session.commit();
+		session.close();
+		return re;
+	}
+	
+	public static int deleteGoods(GoodsVo g) {
+		int re = -1;
+		SqlSession session = factory.openSession();
+		session.delete("goods.delete", g);
+		session.commit();
+		session.close();
+		return re;
+	}
+}

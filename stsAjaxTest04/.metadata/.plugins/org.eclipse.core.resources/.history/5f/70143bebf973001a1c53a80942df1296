@@ -1,0 +1,23 @@
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+@SpringBootApplication
+public class SecuritytestApplication {
+
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+		//스프링시큐리티가 제공해주는 암호를 쓸수있다
+	}
+	
+	
+	public static void main(String[] args) {
+		SpringApplication.run(SecuritytestApplication.class, args);
+	}
+
+}

@@ -1,0 +1,31 @@
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.example.demo.db.MemberManager;
+import com.example.demo.vo.MemberVo;
+
+@SpringBootApplication
+public class SecuritytestApplication {
+
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+		//스프링시큐리티가 제공해주는 암호를 암호화해서 쓸 수 있다
+	}
+	
+	
+	public static void main(String[] args) {
+		
+		MemberManager.insert(new MemberVo("tiger", PasswordEncoderFactories.createDelegatingPasswordEncoder().encode("tiger"), "호랭이", "user"));
+		MemberManager.insert(new MemberVo("master", PasswordEncoderFactories.createDelegatingPasswordEncoder().encode("1234"), "마스타", "admin"));
+														//"1234" 암호를 길고 복잡하게 만들어준다
+		System.out.println("사용자 추가됨");
+		SpringApplication.run(SecuritytestApplication.class, args);
+	}
+
+}

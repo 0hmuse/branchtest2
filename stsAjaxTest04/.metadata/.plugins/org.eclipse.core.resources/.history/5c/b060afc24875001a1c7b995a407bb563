@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<h2>계좌이체</h2>
+	<hr>
+	
+	<form id="f">
+		돈보내는사람: <input type="text" name="from"><br>
+		돈받는사람: <input type="text" name="to"><br>
+		돈보내는금액: <input type="text" name="amount"><br>
+	</form>
+	<button id="btnOk">이제</button>
+</body>
+</html>

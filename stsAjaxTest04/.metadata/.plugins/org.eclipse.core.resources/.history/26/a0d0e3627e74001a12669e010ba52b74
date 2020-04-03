@@ -1,0 +1,22 @@
+package com.example.demo.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class BoardController {
+
+	//로그인 안해도(all) 사용할 수 있는 서비스
+	@GetMapping("/all/list")	
+	public String list() {
+		return "list";
+	}
+	
+	//admin권한이 있어야지만 사용할 수 있는 서비스
+	@GetMapping("/admin/cmd1")
+	public String cmd1() {
+		return "서비스1";
+	}
+	
+	
+}

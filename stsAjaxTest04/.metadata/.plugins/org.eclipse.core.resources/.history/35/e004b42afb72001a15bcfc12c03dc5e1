@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style type="text/css">
+#joinForm{
+	visibility: hidden;
+}
+</style>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script type="text/javascript">
+$(function(){
+		
+	// 인증번호
+	var result;
+	
+	// 인증확인용 메일 보내기
+	$("#SendConfirm").click(function(){
+		var email = {email:$("#email").val()};
+		//alert(email);
+		$.ajax("login.do",{data:email,success:function(r){
+			alert("인증확인 메일 발송!!");
+			result = r;
+		}});
+	});
+	
+	// 메일에보낸 인증번호 확인하기
+	$("#checkConfirm").click(function(){
+		//alert("ok");
+		//result == btnIn 일치하면 회원가입양식 나타나게해준다 
+		var btnIn = $("#btnIn").val();
+		//alert(btnIn);
+		//alert(result);
+		
+		if(result == btnIn){
+			alert("인증번호 일치합니다!");
+			$("#emailCheck").css("visibility","hidden");
+			$("#joinForm").css("visibility","visible");
+			
+			var member = $("#f").serialize();			
+			//이제 회원가입할꺼얌
+			$("#btnLogin").click(function(){				
+				$.ajax("insert.do",{data:member,success:function(r){
+					alert(r);
+				}});
+			});			
+		}else{
+			alert("인증번호를 확인해주세요!");
+		}
+	});
+});
+</script>
+</head>
+<body>
+	<h2>회원등록</h2>
+	<hr>
+	<div id="emailCheck">
+		<table>
+			<tr>
+				<td>회원e-mail :</td>
+				<td><input type="text" id="email" name="email"></td>
+				<td><input type="button" id="SendConfirm" value="인증하기"></input></td>	
+			</tr>	
+			<tr>
+				<td>인증번호 :</td>
+				<td><input type="number" id="btnIn" name="btnIn"></input></td>			
+				<td><input type="button" id="checkConfirm" value="인증확인"></input></td>			
+			</tr>
+		</table>
+	</div>
+	
+	
+	<div id="joinForm">
+		<form id="f">
+			<table>
+				<tr>
+					<td>회원아이디 :</td>
+					<td><input type="text" id="id" name="id"></td>				
+				</tr>			
+				<tr>
+					<td>회원이름 :</td>
+					<td><input type="text" id="name" name="name"></td>			
+				</tr>
+				<tr>
+					<td>전화번호 :</td>
+					<td><input type="text" id="tel" name="tel"></td>			
+				</tr>
+				<tr>
+					<td>회원나이 :</td>
+					<td><input type="number" id="age" name="age"></td>				
+				</tr>				
+				<tr>
+					<td>회원비밀번호 :</td>
+					<td><input type="password" id="pwd" name="pwd"></td>			
+				</tr>				
+			</table>
+		</form>
+		<button id="btnLogin">회원등록</button>
+	</div>
+</body>
+</html>

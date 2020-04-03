@@ -1,0 +1,64 @@
+package com.example.demo.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.demo.dao.EmpDao;
+import com.example.demo.vo.EmpVo;
+import com.google.gson.Gson;
+
+
+@RestController
+public class EmpController {
+	
+	@Autowired
+	private MailSender javaMailSender;
+	public void setJavaMailSender(MailSender javaMailSender) {
+		this.javaMailSender = javaMailSender;
+	}
+	
+	@Autowired
+	private EmpDao dao;		
+	public EmpDao getDao() {
+		return dao;
+	}
+	
+	//@Scheduled(fixedRate = 5000)
+	//@Scheduled(cron = "0 0 14 * * ?")	
+	@RequestMapping("email.do")
+	public String pro(EmpVo ev) {
+		//System.out.println("10초마다");
+		
+		String r = "";
+		String email = "";
+		int sal = 0;;
+		int comm = 0;;
+		List<EmpVo> list = dao.listAll();
+		for(EmpVo emp : list) {
+			email = emp.getEmail();
+			sal = emp.getSal();
+			comm = emp.getComm();
+		}	
+		
+		SimpleMailMessage mailMSG = new SimpleMailMessage();
+		mailMSG.setSubject("메일보냄");
+		mailMSG.setFrom("88.hmuse@gmail.com");
+		mailMSG.setText("오늘은 '메일발송하기' 실습하자");
+		mailMSG.setTo("hajigoun@naver.com");
+		try {
+			javaMailSender.send(mailMSG);
+			System.out.println("메일보내기완료");
+		}catch (Exception e) {
+			// TODO: handle exception
+			System.out.println(e.getMessage());
+		}		
+		return r;
+	}	
+}

@@ -1,0 +1,24 @@
+package com.example.demo.controller;
+
+import javax.mail.internet.MimeMessage;
+
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.mail.javamail.MimeMessagePreparator;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+public class HtmlComtroller {
+	private JavaMailSender mailSender;
+	public void setMailSender(JavaMailSender mailSender) {
+		this.mailSender = mailSender;
+	};
+	
+	@RequestMapping("/mail2.do")
+	public void mail2() {
+		mailSender.send(new MimeMessagePreparator() {
+			public void prepare(MimeMessage mimeMessage) 
+		});
+	}
+}

@@ -1,0 +1,8 @@
+package com.example.demo.db;
+
+import org.apache.ibatis.session.SqlSessionFactory;
+
+public class MemberManager {
+
+	private static SqlSessionFactory factory;
+}

@@ -1,0 +1,15 @@
+package com.example.demo.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@Controller
+public class IndexController {
+
+	//로그인 안해도 모두 사용할 수 있는 서비스
+	@GetMapping("/")
+	public String index() {
+		return "index";
+	}
+}

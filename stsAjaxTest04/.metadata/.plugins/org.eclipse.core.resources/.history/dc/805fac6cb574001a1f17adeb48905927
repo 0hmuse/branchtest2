@@ -1,0 +1,37 @@
+package com.example.demo.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.demo.vo.MemberVo;
+import com.google.gson.Gson;
+
+@Controller
+public class IndexController {
+
+	//로그인 안해도 모두 사용할 수 있는 서비스
+	@GetMapping("/")
+	public String index(Model model) {
+		model.addAttribute("m", new MemberVo("tiger","1234","호랭이","USER"));
+		return "index";
+	}
+	
+	@GetMapping("/login")
+	public String login() {
+		return "login";
+	}
+	
+	@GetMapping(value = "/admin/listMember")
+	public String listAll(Model model) {
+		String str = "";
+		Gson gson = new Gson();
+		str = gson.toJson(dao.listAll());
+		//System.out.println(str);
+		model.addAttribute("m", str);
+		return str;
+	}
+	
+}

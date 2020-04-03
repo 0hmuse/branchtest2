@@ -1,0 +1,17 @@
+package com.example.demo.dao;
+
+public class MemberDao {
+
+	
+	
+	public void listMember2() {
+		System.out.println("하이!!");	
+	}
+<<<<<<< HEAD
+	public void deleteMember2() {
+		System.out.println("회원의 정보를 삭제하였습니다.");
+	}
+=======
+		
+>>>>>>> branch 'master' of https://github.com/hyunsung0308/gitTest.git
+}

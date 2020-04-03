@@ -1,0 +1,49 @@
+package com.example.demo.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.demo.dao.EmpDao;
+import com.example.demo.vo.EmpVo;
+import com.google.gson.Gson;
+
+
+@RestController
+public class EmpController {
+	
+	@Autowired
+	private MailSender javaMailSender;
+	public void setJavaMailSender(MailSender javaMailSender) {
+		this.javaMailSender = javaMailSender;
+	}
+	
+	@Autowired
+	private EmpDao dao;		
+	public EmpDao getDao() {
+		return dao;
+	}
+	
+	//@Scheduled(fixedRate = 5000)
+	//@Scheduled(cron = "0 0 14 * * ?")	
+	@RequestMapping(value = "email.do",produces = "application/json;charset=UTF-8")
+	public String pro(EmpVo ev) {
+		//System.out.println("10초마다");
+		
+		List<EmpVo> list = dao.listAll();
+		for(EmpVo emp : list) {
+			
+		}			
+		String sendTo = ev.getEmail();
+		System.out.println(sendTo);	
+		
+
+		return str;
+	}	
+}

@@ -1,0 +1,13 @@
+package com.example.demo.vo;
+
+public class EmpVo {
+	private int eno;
+	private String ename;
+	private String jab;
+	private int sal;
+	private int comm;
+	private int mgr;
+	private String hitrdate;
+	private int dno;
+	private String email;
+}

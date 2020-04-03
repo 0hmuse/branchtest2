@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script type="text/javascript">
+$(function(){
+	var no = location.search;
+	no = no.substring(no.indexOf("=")+1);
+	//alert(no);
+	var goods = {"no":no}
+	
+	$.ajax("/getGoods",{data:goods,success:function(g){
+		//alert(g);
+	
+		$("#no").val(g.no);
+		$("#item").val(g.item);
+		$("#qty").val(g.qty);
+		$("#price").val(g.price);
+		
+		$("#img").attr({"src":"/img/"+g.fname,width:150,height:150});
+		$("#detail").html(g.detail);				
+	}});	
+	
+	$("#btnDelete").click(function(){
+		$.ajax("/deleteGoods",{data:goods,success:function(r){
+			alert("삭제성공!");
+			window.location.href = "bitShop.html";
+		}});
+	});	
+	$("#btnUpdate").click(function(){
+		$.ajax("/updateGoods",{data:goods,success:function(r){
+			alert("수정성공!");
+			window.location.href = "bitShop.html";
+		}});
+	});
+});
+</script>
+</head>
+<body>
+	<h2>상세보기</h2>
+	<hr>	
+	<table>
+		<tr>
+			<td>
+				<img id="img">
+			<td>
+			<td>
+				<table>
+					<tr>
+						<td>상품번호:</td>
+						<td><input type="number" id="no" name="no" readonly="readonly"></td>
+					</tr>
+					<tr>
+						<td>상품이름:</td>
+						<td><input type="text" id="item" name="item"></td>
+					</tr>
+					<tr>
+						<td>상품가격:</td>
+						<td><input type="number" id="price" name="price"></td>
+					</tr>
+					<tr>
+						<td>상품수량:</td>
+						<td><input type="number" id="qty" name="qty"></td>
+					</tr>
+					<tr>
+						<td>상세설명:</td>
+						<td><textarea rows="8" cols="22" id="detail" name="detail"></textarea></td>
+					</tr>
+				</table>
+			</td>
+		</table>	
+		<button id="btnUpdate">수정</button>
+		<button id="btnDelete">삭제</button>	
+</body>
+</html>

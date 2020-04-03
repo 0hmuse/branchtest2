@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script type="text/javascript">
+$(function(){
+	var arr;	
+
+	$.getJSON("/goodsList",function(data){
+		arr = data;
+		listGoods();
+	});	
+	
+	$("#selGoods").click(function(){
+		alert("이동클릭")
+	});
+	
+	$("#btnAdd").click(function(){
+		var goods = $("#f").serialize();
+		$.ajax("/insertGoods",{data:goods,success:function(r){
+			alert(r + "등록성공!");
+			
+			listGoods();
+		}});
+	});
+	
+	function listGoods(){
+		$.each(arr,function(idx,g){			
+			var tr = $("<tr></tr>");
+			
+			var no = $("<td></td>").html(g.no);
+			var name = $("<a href='detail.html?no="+g.no+"'><td></td></a>").html(g.item);			
+			var price = $("<td></td>").html(g.price);					
+			
+			$(tr).append(no,name,price);			
+			$("#tb").append(tr);
+		});
+	};	
+	
+});
+</script>
+</head>
+<body>
+	<h1>상품목록</h1>
+	<hr>	
+	<table id="tb" border="1" width="80%">
+		<tr>
+			<th>상품번호</th>
+			<th>상품이름</th>			
+			<th>상품가격</th>			
+		</tr>
+	</table>	
+	<hr>
+	<hr>
+	<h2>상품등록</h2>
+	<form id="f">
+		<table>
+			<tr>
+				<td>상품번호:</td>			
+				<td><input type="number" id="no" name="no"></td>								
+			</tr>
+			<tr>								
+				<td>상품이름:</td>				
+				<td><input type="text" id="item" name="item"></td>				
+			</tr>
+			<tr>								
+				<td>상품수량:</td>				
+				<td><input type="text" id="qty" name="qty"></td>				
+			</tr>
+			<tr>								
+				<td>상품가격:</td>				
+				<td><input type="text" id="price" name="price"></td>				
+			</tr>
+			<tr>								
+				<td>상품사진:</td>				
+				<td><input type="file" id="uploadFile" name="uploadFile"></td>				
+			</tr>
+			<tr>								
+				<td>상세설명:</td>				
+				<td><input type="text" id="detail" name="detail"></td>				
+			</tr>
+		</table>		
+	</form>	
+	<button id="btnAdd">등록</button>
+	<button id="btnUpdate">수정</button>
+	<button id="btnDelete">삭제</button>
+</body>
+</html>

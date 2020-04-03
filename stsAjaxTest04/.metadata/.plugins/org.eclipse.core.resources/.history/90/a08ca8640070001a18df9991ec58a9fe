@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script type="text/javascript">
+$(function(){
+	var no = location.search;
+	no = no.substring(no.indexOf("=")+1);
+	//alert(no);
+	var goods = {"no":no}
+	
+	$.ajax("/getGoods",{data:goods,success:function(r){
+		alert(r);
+		$.each(r,function(idx,g){
+			$("#no").html(g.no);
+			$("#item").html(g.item);
+			$("#qty").html(g.qty);
+			$("#price").html(g.price);
+			
+			$("#img").attr({"src":"/img/"+g.fname,width:50,height:50});
+			$("#detail").html(g.detail);
+			
+			alert(g.no);
+		});		
+	}});			
+});
+</script>
+</head>
+<body>
+	<h2>상세보기</h2>
+	<hr>	
+	<table>
+		<tr>
+			<td>
+				<img id="img">
+			<td>
+			<td>
+				<table>
+					<tr>
+						<td>상품번호</td>
+						<td id="no"></td>
+					</tr>
+					<tr>
+						<td>상품이름</td>
+						<td id="item"></td>
+					</tr>
+					<tr>
+						<td>상품가격</td>
+						<td id="price"></td>
+					</tr>
+					<tr>
+						<td>상품수량</td>
+						<td id="qty"></td>
+					</tr>
+					<tr>
+						<td>상세설명</td>
+						<td id="detail"></td>
+					</tr>
+				</table>
+			</td>
+		</table>		
+</body>
+</html>

@@ -1,0 +1,44 @@
+package com.example.demo.vo;
+
+public class TransferVo {
+
+	private String form;	//돈보내는사람
+	private String to;		//돈받는사람
+	private int amount;		//이체금액
+	
+	public TransferVo(String form, String to, int amount) {
+		super();
+		this.form = form;
+		this.to = to;
+		this.amount = amount;
+	}
+
+	public TransferVo() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public String getForm() {
+		return form;
+	}
+
+	public void setForm(String form) {
+		this.form = form;
+	}
+
+	public String getTo() {
+		return to;
+	}
+
+	public void setTo(String to) {
+		this.to = to;
+	}
+
+	public int getAmount() {
+		return amount;
+	}
+
+	public void setAmount(int amount) {
+		this.amount = amount;
+	}
+}

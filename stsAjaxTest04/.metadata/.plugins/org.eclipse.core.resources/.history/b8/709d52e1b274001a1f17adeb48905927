@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org/" xmlns:sec="https://www.w3.org/1999/xhtml">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+</head>
+<body>
+<h2>회원목록</h2>
+<hr>
+	<table>
+		<tr data-th-each="m : ${m}">
+			<td data-th-text="${user.login}">...</td>
+			<td data-th-text="${user.name}">...</td>
+		</tr>
+	</table>
+</body>
+</html>
